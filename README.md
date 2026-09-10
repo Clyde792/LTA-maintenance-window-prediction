@@ -28,7 +28,8 @@ an empirical lower RUL bound.
   only when the peak-conditioned index reaches the failure level while the day average
   does not. Duty is never a relaxation of the aspect. The wear-load interaction that
   makes this measurable is a simulator assumption and must be checked on real telemetry.
-- Decision stability means point/bound action agreement. It is not confidence of correctness.
+- Decision stability (shown on the door-detail card) means point/bound action agreement.
+  It is not confidence of correctness.
 - The four maintenance thresholds are illustrative and must be validated with an operator.
   Missing evidence never clears an existing escalation.
 - The adapter requires reviewed source units and identity joins. An amperesecond

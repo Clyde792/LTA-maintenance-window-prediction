@@ -88,9 +88,11 @@ in `headway/synth/doors.py`): a worn door is disproportionately worse under crow
 This is a simulator assumption drawn from operator experience, not a measurement.
 It is what `headway/duty.py` detects. The synthetic data was regenerated with the
 same seed and every artifact rebuilt, so the table above no longer matches
-`data/validation_report.json` exactly. Current figures: chronological 6/6 found,
-6.05 d worst warning, 93.5% precision, 3.9 d MAE, 94.0% coverage (median bound
-still 0 d); entire-train holdout 74.2% coverage, 9.0 d MAE, 37.5% abstention.
+`data/validation_report.json` exactly. The generator also gained a non-instant repair tail (`repair_days`) and pulls its
+latest two episodes up to the final days of the record, so the dashboard's "now"
+screen is never empty. Current figures: chronological 6/6 found, 6.05 d worst
+warning, 78% precision, 3.5 d MAE, 97% coverage (median bound still 0 d);
+entire-train holdout 76% coverage, 8.7 d MAE, 37% abstention.
 Every headline survived; `SUBMISSION.md` and `TECHNICAL_OVERVIEW.md` carry the
 current numbers. Two design decisions were forced by evidence during the build:
 the sensitivity window was cut from 7 to 3 days after it left restrictions on

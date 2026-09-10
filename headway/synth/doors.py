@@ -76,6 +76,13 @@ class SynthConfig:
     # includes degradation and the asset baselines itself as already-sick.
     min_healthy_days: float = 25.0
 
+    # Repair is not instant. After a confirmed fault the door goes to the depot
+    # and its health decays back to baseline over a few days rather than snapping
+    # to zero. Side effect, and the point of it: a door that failed in the last
+    # days of the record is still visibly degraded "today" - the realistic fleet
+    # snapshot, where something is always mid-life.
+    repair_days: float = 2.5
+
     # --- effect sizes: the confound/degradation balance that makes the demo work
     temp_coeff: float = 0.055         # A.s per degree C above reference
     load_coeff: float = 0.42          # A.s at full crowding
@@ -122,18 +129,28 @@ def generate(cfg: SynthConfig | None = None) -> tuple[pd.DataFrame, pd.DataFrame
     # (the realistic case: the fleet is never uniformly healthy).
     ep_assets = rng.choice(n_assets, size=cfg.n_episodes, replace=False)
     fault_day = rng.uniform(0.45, 0.98, cfg.n_episodes) * cfg.n_days
-    onset_lead = rng.uniform(18, 45, cfg.n_episodes)
+    onset_lead_raw = rng.uniform(18, 45, cfg.n_episodes)
     # Clamp so onset never precedes the data, or the baseline reference window.
     # An episode that would have started too early simply gets a shorter ramp -
     # realistic, and it keeps `warning_days_available` an honest ceiling for the
     # capture metric rather than a number the detector never had access to.
-    onset_day = np.maximum(fault_day - onset_lead, cfg.min_healthy_days)
+    onset_day = np.maximum(fault_day - onset_lead_raw, cfg.min_healthy_days)
     onset_lead = fault_day - onset_day
     wear_shape = rng.uniform(1.8, 2.8, cfg.n_episodes)  # convexity of the wear curve
     modes = rng.choice(
         ["roller_wear", "gearbox_wear", "belt_tension_loss", "guide_contamination"],
         size=cfg.n_episodes,
     )
+
+    # Pull the latest few episodes right up to the final days of the record, so
+    # "today" always shows doors mid-degradation or freshly repaired - the
+    # realistic fleet snapshot, and a non-empty first screen. Drawn last so the
+    # rest of the degradation plan is identical to the base generator.
+    n_recent = max(2, cfg.n_episodes // 4)
+    late = np.argsort(fault_day)[-n_recent:]
+    fault_day[late] = cfg.n_days - rng.uniform(0.5, 4.5, n_recent)
+    onset_day[late] = np.maximum(fault_day[late] - onset_lead_raw[late], cfg.min_healthy_days)
+    onset_lead[late] = fault_day[late] - onset_day[late]
 
     onset_by_asset = np.full(n_assets, np.nan)
     fault_by_asset = np.full(n_assets, np.nan)
@@ -209,6 +226,11 @@ def generate(cfg: SynthConfig | None = None) -> tuple[pd.DataFrame, pd.DataFrame
     in_window = has_ep & (t_days >= onset) & (t_days <= fault)
     progress[in_window] = np.clip(raw[in_window], 0.0, 1.0)
     h = np.where(in_window, progress ** np.where(has_ep, shape, 1.0), 0.0)
+
+    # After the fault, decay from h=1 back to baseline over `repair_days` rather
+    # than an instant reset (see SynthConfig.repair_days).
+    post = has_ep & (t_days > fault)
+    h = np.where(post, np.exp(-(t_days - fault) / max(cfg.repair_days, 1e-6)), h)
 
     # A slow benign random walk on every asset, so "healthy" is not a flat line.
     h = h + np.abs(rng.normal(0, 0.006, n)) * (t_days / cfg.n_days)

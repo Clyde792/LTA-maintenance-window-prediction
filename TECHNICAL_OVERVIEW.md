@@ -31,7 +31,8 @@ thing to understand first.
 
 Data flows: **cycles → contract → normalise → per-asset baseline → multivariate
 index → trend → RUL → aspect policy → fit-for-duty → window comparison →
-dashboard**. Each stage is a component with its own tests.
+dashboard** (Status / Review / Planner / Fleet / Door detail). Each stage is a
+component with its own tests.
 
 ### 2.1 The Feature Contract — `headway/contract.py`
 
@@ -193,9 +194,23 @@ load** — it holds together at 14:00 and fails at 08:15.
 ### 2.10 The dashboard — `scripts/build_ui.py` → `ui/headway.html`
 
 One self-contained HTML file, no server. Every figure comes from the pipeline.
-Light theme, explicit unknown states, "decision stability" (do the point
-estimate and the bound agree on an action) rather than "confidence", chart gaps
-preserved, labelled a retrospective synthetic demonstration.
+Four views, plain-language throughout:
+
+- **Status** — doors needing action *now* (the latest telemetry day): withdraw,
+  next-window, off-peak-only, or a data problem. The first screen.
+- **Review** — doors flagged in the trailing three weeks that are *not* on Status:
+  recently escalated and now recovered ("confirm the repair held"), or sitting at
+  the plan-ahead level.
+- **Planner** — for a chosen engineering-window date, the candidate jobs as an
+  ordered priority list; reorder with the arrows, defer below the line, choices
+  saved per date in the browser.
+- **Door detail** — the wear-level chart *is* the date scrubber (drag it), with a
+  fault-level line, the full card at that day, and a Back button.
+
+The date slider lives only on Fleet. Card language: "safe time left" (the lower
+bound), a "wear now / fault at" gauge, "can the fix wait?" (the window
+comparison), and the fit-for-duty flag. Chart gaps preserved; one "demo,
+simulated data" line; light + dark.
 
 ---
 
@@ -210,20 +225,20 @@ faults confirmed by 24 June; test on later observations.
 |---|---:|---|
 | Future episodes found | 6 / 6 | — |
 | Worst-case warning | 6.05 d | — |
-| Alert precision | 93.5% | 0.02 false alerts per asset-month |
-| RUL point error | 3.9 d MAE | — |
-| Lower-bound coverage | 94.0% | median bound is **0 days**; only 33% positive |
-| Abstention on degradation rows | 8.4% | — |
-| Restricted to off-peak before the fault | 6 / 6 | median 5.6 d ahead; 0 of 2,654 healthy asset-days restricted |
+| Alert precision | 78.1% | 0.07 false alerts per asset-month |
+| RUL point error | 3.5 d MAE | — |
+| Lower-bound coverage | 97.4% | median bound is **0 days**; only 34% positive |
+| Abstention on degradation rows | 13.8% | — |
+| Restricted to off-peak before the fault | 6 / 6 | median 2 d ahead; 0 of 2,654 healthy asset-days restricted |
 
 **Whole train held out (stricter).** Refit *everything* with an entire train
 removed, for each of 9 fault trains.
 
 | | result |
 |---|---:|
-| Lower-bound coverage | **74.2%** (target 90%) |
-| RUL point error | 9.0 d MAE |
-| Abstention | 37.5% |
+| Lower-bound coverage | **75.8%** (target 90%) |
+| RUL point error | 8.7 d MAE |
+| Abstention | 37.3% |
 
 The stricter test **misses the target**, and the dashboard says so.
 

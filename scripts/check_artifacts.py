@@ -26,7 +26,7 @@ def main():
     assert len(payload["assets"])==d.asset_id.nunique()
     assert 'data-theme="light"' in html
     assert "riskCeiling" not in html and "Latest date under 10% risk" not in html
-    assert "Decision stability" in html and "retrospective" in payload["scope"]
+    assert "Safe time left" in html and "simulated" in payload["scope"].lower()
     for asset in payload["assets"]:
         for row in asset["rows"]:
             assert set(row["windows"].values())<={"unknown","within_margin","exceeds_margin","no_positive_margin","threshold_exceeded"}

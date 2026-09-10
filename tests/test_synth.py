@@ -116,7 +116,7 @@ def test_asset_is_repaired_after_confirmed_fault(cycles, episodes):
         before = a[a.ts < e.onset_ts][SIGNAL].mean()
         just_before_fault = a[(a.ts >= e.fault_ts - pd.Timedelta(days=3))
                               & (a.ts <= e.fault_ts)][SIGNAL].mean()
-        after = a[a.ts > e.fault_ts + pd.Timedelta(days=3)][SIGNAL]
+        after = a[a.ts > e.fault_ts + pd.Timedelta(days=8)][SIGNAL]
         if len(after) < 50:
             continue          # episode ran to the end of the window
         checked += 1
@@ -125,6 +125,15 @@ def test_asset_is_repaired_after_confirmed_fault(cycles, episodes):
             "a repaired door must return to roughly its own pre-onset baseline"
         )
     assert checked > 0, "no episode had enough post-fault data to verify repair"
+
+
+def test_something_is_always_live_at_the_end(cycles, episodes):
+    """The last day of the record must not be a uniformly-healthy fleet: at least
+    two episode doors are still degrading or within the repair tail, so the
+    dashboard's "now" screen is never empty."""
+    end = cycles.ts.max()
+    recent = (episodes.fault_ts > end - pd.Timedelta(days=6)).sum()
+    assert recent >= 2, f"only {recent} episodes fault in the final week"
 
 
 def test_per_asset_build_tolerance_exists(cycles, episodes):

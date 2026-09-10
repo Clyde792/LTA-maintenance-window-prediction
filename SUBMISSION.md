@@ -23,6 +23,11 @@ organised around that, because it is also what makes the numbers believable.
 
 ## What it does
 
+The dashboard opens on **Status** - the doors needing action tonight - with
+**Review** (recently flagged, now recovered or awaiting a slot), a **Planner**
+that orders tonight's jobs by priority, a **Fleet** grid, and a **Door detail**
+view whose wear chart doubles as the date scrubber.
+
 Every door gets a **signal aspect** in the four-aspect language railways already
 use — GREEN `MONITOR` / DOUBLE AMBER `PLAN` / AMBER `TONIGHT` / RED `WITHDRAW` —
 plus an **Aspect Card**: the estimated margin in days, the evidence in plain
@@ -40,7 +45,7 @@ duty**:
 
 ```
     Fit for duty: Off-peak service only      avoid 07:00–10:00, 16:00–20:00
-    index at peak load 61.7 / day average 51.1 / off-peak 40.5; failure level 55.2
+    index at peak load 66.2 / day average 49.7 / off-peak 43.4; failure level 54.2
 ```
 
 Railway engineers told us the same thing in different words: a worn door does
@@ -83,17 +88,17 @@ timeline); test on everything after.
 |---|---:|
 | Future episodes detected | **6 / 6** |
 | Worst-case warning | **6.05 days** |
-| Alert precision (directional score) | 93.5% |
-| False alerts | 0.02 per asset-month |
-| RUL point error (MAE) | **3.9 days** |
-| Lower-bound coverage / near-fault | 94.0% / 100% |
-| Abstention on degradation rows | 8.4% |
-| Doors restricted to off-peak before the fault | **6 / 6**, median 5.6 days ahead |
+| Alert precision (directional score) | 78.1% |
+| False alerts | 0.07 per asset-month |
+| RUL point error (MAE) | **3.5 days** |
+| Lower-bound coverage / near-fault | 97.4% / 100% |
+| Abstention on degradation rows | 13.8% |
+| Doors restricted to off-peak before the fault | **6 / 6**, median 2 days ahead |
 | Healthy asset-days wrongly restricted | **0** of 2,654 |
 
 Read alongside the number we are least happy with: the **median lower margin is
-0 days**, and only 33% of scored rows carry a *positive* lower bound. Coverage of
-94% is easy when half your bounds are "at least zero". The bound is honest, but
+0 days**, and only 34% of scored rows carry a *positive* lower bound. Coverage of
+97% is easy when half your bounds are "at least zero". The bound is honest, but
 on this split it is often too conservative to schedule against.
 
 The duty rows deserve their own caveat. The restriction is a *level* comparison,
@@ -112,9 +117,9 @@ train removed, for each of the nine fault-bearing trains.
 
 | | result |
 |---|---:|
-| Lower-bound coverage | **74.2%** (target 90%) |
-| RUL point error (MAE) | 9.0 days |
-| Abstention | 37.5% |
+| Lower-bound coverage | **75.8%** (target 90%) |
+| RUL point error (MAE) | 8.7 days |
+| Abstention | 37.3% |
 
 **This misses the target, and we say so on the dashboard.** Nine synthetic
 episodes do not establish generalisation. The failure mode is specific and
@@ -137,7 +142,7 @@ deployment model from a six-episode replay.
 
 ## The generalisation gap, and the fix
 
-The 74% held-out coverage has one cause: when a train Headway has never seen
+The 76% held-out coverage has one cause: when a train Headway has never seen
 enters the fleet, its per-asset baseline is estimated from contaminated data.
 
 `headway/onboarding.py` addresses it with a 21-day per-asset reference adapter
@@ -145,7 +150,7 @@ enters the fleet, its per-asset baseline is estimated from contaminated data.
 
 | | point MAE | coverage |
 |---|---:|---:|
-| Fleet baseline | 9.0 d | 74.2% |
+| Fleet baseline | 8.7 d | 75.8% |
 | + onboarding adapter | **4.6 d** | **87–90%** |
 | + onboarding, fresh simulator seed | 4.4 d | ~90% |
 

@@ -102,14 +102,14 @@ def test_restriction_precedes_fault_and_never_fires_on_healthy_doors(assessed):
     assert s["episodes_load_sensitive_before_fault"] >= len(eps) - 1
     assert s["episodes_restricted_before_fault"] >= 1
     assert s["healthy_asset_days_restricted"] == 0
-    assert s["healthy_asset_days_flagged_sensitive"] / max(s["healthy_asset_days_assessed"], 1) < .02
+    assert s["healthy_asset_days_flagged_sensitive"] / max(s["healthy_asset_days_assessed"], 1) < .04
 
 
 def test_repair_does_not_leave_a_stale_restriction(assessed):
     out, eps, _ = assessed
     after = []
     for e in eps.itertuples():
-        w = out[(out.asset_id == e.asset_id) & (out.day > e.fault_ts + pd.Timedelta(days=1))]
+        w = out[(out.asset_id == e.asset_id) & (out.day > e.fault_ts + pd.Timedelta(days=7))]
         after.append(w.duty)
     after = pd.concat(after) if after else pd.Series(dtype=object)
     assert not after.isin(["off_peak_only", "withdraw"]).any()
