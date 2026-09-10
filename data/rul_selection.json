@@ -1,0 +1,63 @@
+{
+  "selection_reason": "fixed baseline; insufficient qualifying inner validation",
+  "qualified": false,
+  "selected": {
+    "projection": "loglinear",
+    "mode": "additive"
+  },
+  "candidates": [
+    {
+      "projection": "linear",
+      "mode": "additive",
+      "episode_rows": 301,
+      "scored_rows": 172,
+      "abstention_rate": 0.4285714285714286,
+      "evaluated_groups": 9,
+      "macro_lower_coverage": 0.9701135852451641,
+      "near_fault_lower_coverage": 1.0,
+      "point_mae_days": 16.00848688347343,
+      "median_lower_days": 0.0,
+      "positive_margin_fraction": 0.11046511627906977
+    },
+    {
+      "projection": "loglinear",
+      "mode": "additive",
+      "episode_rows": 301,
+      "scored_rows": 190,
+      "abstention_rate": 0.3687707641196013,
+      "evaluated_groups": 9,
+      "macro_lower_coverage": 0.8634377692525089,
+      "near_fault_lower_coverage": 1.0,
+      "point_mae_days": 4.001937007687584,
+      "median_lower_days": 4.3333703213738115,
+      "positive_margin_fraction": 0.6526315789473685
+    },
+    {
+      "projection": "loglinear",
+      "mode": "ratio",
+      "episode_rows": 301,
+      "scored_rows": 190,
+      "abstention_rate": 0.3687707641196013,
+      "evaluated_groups": 9,
+      "macro_lower_coverage": 0.8679302832244009,
+      "near_fault_lower_coverage": 0.8253968253968254,
+      "point_mae_days": 4.001937007687584,
+      "median_lower_days": 6.5132850775398845,
+      "positive_margin_fraction": 0.9421052631578948
+    },
+    {
+      "projection": "loglinear",
+      "mode": "mondrian",
+      "episode_rows": 301,
+      "scored_rows": 190,
+      "abstention_rate": 0.3687707641196013,
+      "evaluated_groups": 9,
+      "macro_lower_coverage": 0.8613943355119826,
+      "near_fault_lower_coverage": 0.8253968253968254,
+      "point_mae_days": 4.001937007687584,
+      "median_lower_days": 6.621150462262303,
+      "positive_margin_fraction": 0.9421052631578948
+    }
+  ],
+  "scope": "RUL-stage inner validation; demo model refitted on all available labels"
+}

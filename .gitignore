@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+data/*.parquet
+.ipynb_checkpoints/
+data/_demo_vendor_export.csv
