@@ -29,6 +29,16 @@ that is the entire point. Three properties are engineered in:
      reporting 99.99% accuracy is reporting that it predicted "healthy" every
      time. The harness refuses to show accuracy for exactly this reason.
 
+  4. WEAR AND LOAD INTERACT.
+     A worn mechanism is not just higher on average; it is disproportionately
+     worse UNDER LOAD. A crowded peak-hour cycle costs a healthy door
+     `load_coeff`; it costs a door at end of life `load_coeff + load_wear_coeff`.
+     This is the operational claim behind the duty restriction ("fit for
+     off-peak service, not for the peaks"): a door can look tolerable across a
+     day's average and still be the one that fails at 08:15. It is a modelling
+     ASSUMPTION drawn from operator experience, not a measured coefficient, and
+     it must be checked against real telemetry before any duty claim is made.
+
 Degradation follows a convex wear curve (slow onset, accelerating failure),
 which is what gives Hindsight its story: the aspect escalates GREEN -> DOUBLE
 AMBER -> AMBER over days before the recorded failure. A confirmed fault sends
@@ -70,6 +80,7 @@ class SynthConfig:
     temp_coeff: float = 0.055         # A.s per degree C above reference
     load_coeff: float = 0.42          # A.s at full crowding
     wear_coeff: float = 0.60          # A.s at end-of-life (h = 1)
+    load_wear_coeff: float = 0.45     # EXTRA A.s at full crowding AND end-of-life
     asset_spread: float = 0.15        # per-asset build tolerance, 1 sigma
     noise: float = 0.09               # per-cycle measurement noise, 1 sigma
 
@@ -211,6 +222,7 @@ def generate(cfg: SynthConfig | None = None) -> tuple[pd.DataFrame, pd.DataFrame
         + cfg.load_coeff * load
         + 0.08 * np.sin(2 * np.pi * hour / 24.0)
         + cfg.wear_coeff * h
+        + cfg.load_wear_coeff * load * h      # property 4: worse under load
         + asset_offset[asset_idx]
         + rng.normal(0, cfg.noise, n)
     )
@@ -220,6 +232,7 @@ def generate(cfg: SynthConfig | None = None) -> tuple[pd.DataFrame, pd.DataFrame
         + 0.30 * load
         + 0.012 * dtemp
         + 0.26 * h
+        + 0.20 * load * h
         + 0.35 * asset_offset[asset_idx]
         + rng.normal(0, 0.06, n)
     )
@@ -229,6 +242,7 @@ def generate(cfg: SynthConfig | None = None) -> tuple[pd.DataFrame, pd.DataFrame
         + 0.90 * load
         + 0.030 * dtemp
         + 0.72 * h
+        + 0.55 * load * h
         + 0.60 * asset_offset[asset_idx]
         + rng.normal(0, 0.18, n)
     )
@@ -241,7 +255,7 @@ def generate(cfg: SynthConfig | None = None) -> tuple[pd.DataFrame, pd.DataFrame
     # Obstruction is driven overwhelmingly by CROWDING, not by wear. Any model
     # that chases obstruction_flag will learn the peak-hour timetable instead of
     # the fault - a trap we want present in the data so the tournament exposes it.
-    p_obs = np.clip(0.008 + 0.100 * load + 0.030 * h, 0, 1)
+    p_obs = np.clip(0.008 + 0.100 * load + 0.030 * h + 0.060 * load * h, 0, 1)
     obstruction = (rng.random(n) < p_obs).astype(np.int8)
 
     p_retry = np.clip(0.004 + 0.35 * obstruction * 0.1 + 0.045 * h, 0, 1)

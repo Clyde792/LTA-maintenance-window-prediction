@@ -18,6 +18,9 @@ def main():
     for h in (0.,3.,7.,14.,28.):
         expected=[compare_window(m,s,h) for m,s in zip(d.rul_lower,d.prediction_state)]
         assert d[horizon_key(h)].tolist()==expected
+    assert set(d.duty.unique())<={"full_service","off_peak_only","withdraw","not_assessed"}
+    assert not (d.duty.eq("withdraw")&d.prediction_state.ne("threshold_exceeded")).any(), "withdraw duty without threshold exceeded"
+    assert not (d.duty.eq("off_peak_only")&~d.load_sensitive).any(), "restriction without measured load sensitivity"
     html=(ROOT/"ui/headway.html").read_text(encoding="utf-8")
     payload=json.loads(re.search(r'<script type="application/json" id="payload">(.*?)</script>',html,re.S).group(1))
     assert len(payload["assets"])==d.asset_id.nunique()
@@ -27,6 +30,7 @@ def main():
     for asset in payload["assets"]:
         for row in asset["rows"]:
             assert set(row["windows"].values())<={"unknown","within_margin","exceeds_margin","no_positive_margin","threshold_exceeded"}
+            assert row["duty"] in {"full_service","off_peak_only","withdraw","not_assessed"}
     node=shutil.which("node")
     if not node:
         raise RuntimeError("Node required for generated JavaScript syntax check")

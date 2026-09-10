@@ -161,3 +161,26 @@ def test_episodes_sidecar_matches_labels(cycles, episodes):
     assert labelled == set(episodes.asset_id)
     assert (episodes.fault_ts > episodes.onset_ts).all()
     assert (episodes.warning_days_available > 0).all()
+
+
+def test_wear_and_load_interact(cycles, episodes):
+    """Property 4: a worn door is disproportionately worse UNDER LOAD. This is
+    the simulator assumption behind fit-for-duty; on healthy doors the load
+    effect must be the plain fleet effect, on doors near failure it must be
+    larger. If this inverts, the duty restriction is measuring nothing."""
+    healthy = cycles[~cycles.asset_id.isin(episodes.asset_id)]
+
+    def load_effect(frame):
+        busy = frame[frame.load_proxy > 0.75][SIGNAL].mean()
+        quiet = frame[frame.load_proxy < 0.25][SIGNAL].mean()
+        return busy - quiet
+
+    worn = []
+    for _, e in episodes.iterrows():
+        a = cycles[(cycles.asset_id == e.asset_id)
+                   & (cycles.ts >= e.fault_ts - pd.Timedelta(days=4)) & (cycles.ts <= e.fault_ts)]
+        if len(a) > 40:
+            worn.append(load_effect(a))
+    assert worn, "no episode had enough near-fault cycles"
+    assert float(np.mean(worn)) > 1.3 * load_effect(healthy), (
+        f"near-fault load effect {np.mean(worn):.3f} must exceed healthy {load_effect(healthy):.3f}")

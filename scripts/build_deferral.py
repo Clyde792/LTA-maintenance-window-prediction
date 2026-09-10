@@ -6,7 +6,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from headway.deferral import DeferralLedger
 ROOT=Path(__file__).resolve().parents[1]
 def main():
-    d=pd.read_parquet(ROOT/"data/door_aspects.parquet")
+    d=pd.read_parquet(ROOT/"data/door_duty.parquet")
     out=DeferralLedger().ledger(d)
     out.to_parquet(ROOT/"data/door_deferral.parquet",index=False)
     print("Built window comparisons using existing card margins. No failure probabilities.")

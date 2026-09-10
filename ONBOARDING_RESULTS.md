@@ -1,7 +1,9 @@
 # New-asset onboarding experiment
 
-Completed 10 September 2026. This is simulator evidence, not validation on an
-operating railway. No experimental variant has been promoted into the dashboard.
+Completed 10 September 2026, and re-run the same day after the generator gained a
+wear-load interaction (see `AUDIT_FIXES.md`, addendum). This is simulator
+evidence, not validation on an operating railway. No experimental variant has
+been promoted into the dashboard.
 
 ## What changed
 
@@ -29,18 +31,18 @@ other trains' later outcomes in training; it measures retrospective generalisati
 
 | Fleet | Variant | Point MAE, days | Lower-bound coverage | Abstention |
 |---|---|---:|---:|---:|
-| Existing development fleet | Fleet baseline | 8.87 | 72.9% | 39.5% |
-| Existing development fleet | Onboarding, pooled | 3.95 | 85.3% | 37.2% |
-| Existing development fleet | Onboarding, balanced | 3.95 | 89.8% | 37.2% |
-| Existing development fleet | Onboarding, ratio | 3.95 | 86.1% | 37.2% |
-| Fresh seed 20260910 | Fleet baseline | 8.03 | 79.6% | 39.3% |
-| Fresh seed 20260910 | Onboarding, pooled | 4.16 | 88.9% | 37.0% |
-| Fresh seed 20260910 | Onboarding, balanced | 4.16 | 88.9% | 37.0% |
-| Fresh seed 20260910 | Onboarding, ratio | 4.16 | 86.5% | 37.0% |
+| Existing development fleet | Fleet baseline | 8.98 | 74.2% | 37.5% |
+| Existing development fleet | Onboarding, pooled | 4.61 | 87.5% | 31.6% |
+| Existing development fleet | Onboarding, balanced | 4.61 | 89.8% | 31.6% |
+| Existing development fleet | Onboarding, ratio | 4.61 | 86.9% | 31.6% |
+| Fresh seed 20260910 | Fleet baseline | 6.57 | 82.9% | 36.7% |
+| Fresh seed 20260910 | Onboarding, pooled | 4.45 | 89.6% | 33.7% |
+| Fresh seed 20260910 | Onboarding, balanced | 4.45 | 89.6% | 33.7% |
+| Fresh seed 20260910 | Onboarding, ratio | 4.45 | 88.3% | 33.7% |
 
 Both fleets have nine evaluated fault-bearing train groups. The development fleet
-has 301 eligible episode-days, of which 182 baseline and 189 onboarded rows are
-scored. The replication has 300 eligible days, with the same scored counts.
+has 301 eligible episode-days, of which 188 baseline and 206 onboarded rows are
+scored. The replication has 300 eligible days, with 190 and 199 scored.
 MAE is calculated only where a prediction exists; baseline and onboarding therefore
 do not have identical scored populations. Daily observations are correlated.
 Coverage is averaged across evaluated groups and checks whether the lower bound
@@ -53,16 +55,16 @@ the timeline, and uses only other-train faults confirmed by that cutoff.
 
 | Fleet | Variant | Point MAE, days | Lower-bound coverage | Abstention |
 |---|---|---:|---:|---:|
-| Development | Fleet baseline | 7.50 | 86.0% | 10.3% |
-| Development | Onboarding, pooled | 3.46 | 95.8% | 10.3% |
-| Development | Onboarding, balanced | 3.46 | 95.8% | 10.3% |
-| Development | Onboarding, ratio | 3.46 | 94.4% | 10.3% |
-| Replication | Fleet baseline | 2.89 | 100.0% | 0.0% |
-| Replication | Onboarding, pooled | 1.62 | 100.0% | 0.0% |
-| Replication | Onboarding, balanced | 1.62 | 100.0% | 0.0% |
-| Replication | Onboarding, ratio | 1.62 | 100.0% | 0.0% |
+| Development | Fleet baseline | 6.47 | 87.4% | 8.4% |
+| Development | Onboarding, pooled | 3.91 | 94.0% | 8.4% |
+| Development | Onboarding, balanced | 3.91 | 96.2% | 8.4% |
+| Development | Onboarding, ratio | 3.91 | 93.6% | 8.4% |
+| Replication | Fleet baseline | 2.36 | 100.0% | 0.0% |
+| Replication | Onboarding, pooled | 1.49 | 100.0% | 0.0% |
+| Replication | Onboarding, balanced | 1.49 | 100.0% | 0.0% |
+| Replication | Onboarding, ratio | 1.49 | 94.4% | 0.0% |
 
-Development evaluates six groups and 107 episode-days (96 scored). Replication
+Development evaluates six groups and 107 episode-days (98 scored). Replication
 evaluates only three groups and 48 scored episode-days. Its 100% coverage is a
 small-sample result. Pooled and balanced onboarding have a median lower bound of
 zero in both chronological tests: high coverage alone does not mean useful
@@ -76,13 +78,14 @@ use, inspection or maintenance evidence must establish a suitable reference;
 otherwise adaptation could absorb existing degradation into the baseline.
 
 **Keep group-balanced calibration experimental.** Its development coverage gain
-does not repeat on the fresh seed. Neither additive variant consistently reaches
-the nominal 90% coverage target across the held-out train tests.
+(87.5% to 89.8%) does not repeat on the fresh seed (89.6% either way). Neither
+additive variant consistently reaches the nominal 90% coverage target across the
+held-out train tests.
 
 **Do not select ratio calibration merely for longer usable margins.** It increases
 the fraction of eligible rows with a positive, correctly covered lower bound from
-33.2% to 52.5% in development and 38.0% to 53.3% in replication, relative to pooled
-onboarding. But near-fault coverage drops from 100% to 82.5% and 73.0%, respectively,
+34.6% to 58.1% in development and 35.3% to 56.3% in replication, relative to pooled
+onboarding. But near-fault coverage drops from 100% to 82.5% and 76.2%, respectively,
 in the train-holdout tests. This tradeoff matters directly to deferral decisions.
 
 The next evaluation should fix its protocol before examining new outcomes, include
@@ -101,7 +104,7 @@ $env:OMP_NUM_THREADS='1'
 .\.venv\Scripts\python.exe -B -m pytest tests -q -p no:cacheprovider
 ```
 
-The completed test suite passed **181 tests**, including reference isolation,
+The completed test suite passed **197 tests**, including reference isolation,
 pre-readiness abstention, future-telemetry invariance and held-out-label isolation.
 
 - [Fixed protocol and script hash](data/onboarding_experiment/protocol.json)

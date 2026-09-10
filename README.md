@@ -22,6 +22,12 @@ an empirical lower RUL bound.
   Missing health channels produce no combined health estimate.
 - The ledger uses the exact bound on the aspect card. It displays window compatibility,
   not failure probabilities, risk budgets or guaranteed safe dates.
+- Fit-for-duty is a level comparison, not a forecast. It measures each asset's excess
+  load sensitivity from crowded-versus-quiet cycles in the same window as the index,
+  re-runs the card's model at the reference peak load, and restricts to off-peak service
+  only when the peak-conditioned index reaches the failure level while the day average
+  does not. Duty is never a relaxation of the aspect. The wear-load interaction that
+  makes this measurable is a simulator assumption and must be checked on real telemetry.
 - Decision stability means point/bound action agreement. It is not confidence of correctness.
 - The four maintenance thresholds are illustrative and must be validated with an operator.
   Missing evidence never clears an existing escalation.
@@ -37,6 +43,7 @@ From this directory, using the existing virtual environment:
 .\.venv\Scripts\python.exe -B scripts/build_health.py
 .\.venv\Scripts\python.exe -B scripts/build_rul.py
 .\.venv\Scripts\python.exe -B scripts/build_aspects.py
+.\.venv\Scripts\python.exe -B scripts/build_duty.py
 .\.venv\Scripts\python.exe -B scripts/build_deferral.py
 .\.venv\Scripts\python.exe -B scripts/build_ui.py
 .\.venv\Scripts\python.exe -B scripts/validate_pipeline.py

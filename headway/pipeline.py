@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from . import contract, features
 from .normalise import ConditionNormaliser, AssetBaseline, MultivariateHealthIndex
+from . import duty as duty_mod
 
 # Usage since service can carry degradation itself. Preserve it as a feature;
 # do not regress it out of wear. A load proxy requires validation on real data.
@@ -16,12 +17,16 @@ class HealthPipeline:
     baselines: dict = field(default_factory=dict,init=False)
     multivariate: object = field(default=None,init=False)
     fitted_at: object = field(default=None,init=False)
+    # Peak service bands and their reference loads, frozen at fit for duty assessment.
+    peak_bands: list = field(default_factory=list,init=False)
+    load_peak: float = field(default=float("nan"),init=False)
+    load_offpeak: float = field(default=float("nan"),init=False)
 
     @property
     def levels(self):
         return [s for s in contract.get(self.subsystem).signals if not s.endswith(("_flag","_count"))]
 
-    def _daily(self, cycles):
+    def _residualise(self, cycles):
         c=cycles.copy()
         supported=c.context_supported.fillna(False).to_numpy(bool).copy() if "context_supported" in c else np.ones(len(c),bool)
         for s,m in self.normalisers.items():
@@ -29,13 +34,25 @@ class HealthPipeline:
             c[f"res_{s}"]=v.residual
             supported &= v.context_supported.to_numpy(bool)
         c["context_supported"]=supported
-        return features.to_daily(c,self.subsystem,extra=tuple(f"res_{s}" for s in self.levels))
+        return c
+
+    def _daily(self, cycles):
+        return features.to_daily(self._residualise(cycles),self.subsystem,extra=tuple(f"res_{s}" for s in self.levels))
+
+    def _cycle_index(self, c):
+        """The card's index applied per cycle: same baselines, same weights.
+        Only used for within-day load contrast; daily decisions still come from
+        the daily aggregate."""
+        for s,b in self.baselines.items():
+            c[f"{s}_hx"]=b.transform(c).health_index
+        return self.multivariate.transform(c).health_index
 
     def fit(self, reference):
         if reference.empty:
             raise ValueError("historical reference data required")
         self.fitted_at=reference.ts.max().floor("D")+pd.Timedelta(days=1)
         self.normalisers={s:ConditionNormaliser(s,NORMALISATION_CONTEXT).fit(reference) for s in self.levels}
+        self.peak_bands,self.load_peak,self.load_offpeak=duty_mod.peak_bands(reference)
         d=self._daily(reference)
         self.baselines={}
         for s in self.levels:
@@ -50,7 +67,11 @@ class HealthPipeline:
     def transform(self, cycles):
         if self.multivariate is None:
             raise RuntimeError("HealthPipeline.fit() required")
-        d=self._daily(cycles)
+        c=self._residualise(cycles)
+        d=features.to_daily(c,self.subsystem,extra=tuple(f"res_{s}" for s in self.levels))
+        c["cycle_index"]=self._cycle_index(c)
+        d=d.merge(duty_mod.cycle_stats(c),on=["asset_id","day"],how="left",validate="one_to_one")
+        d[list(duty_mod.STATS)]=d[list(duty_mod.STATS)].fillna(0.)
         for s,b in self.baselines.items():
             transformed=b.transform(d)
             d[f"{s}_hx"]=transformed.health_index

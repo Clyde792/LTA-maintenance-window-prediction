@@ -5,100 +5,113 @@
   "future_fault_episodes": 6,
   "chronological_rul": {
     "episode_rows": 107,
-    "scored_rows": 96,
-    "abstention_rate": 0.10280373831775702,
+    "scored_rows": 98,
+    "abstention_rate": 0.08411214953271029,
     "evaluated_groups": 6,
-    "macro_lower_coverage": 0.9722222222222223,
+    "macro_lower_coverage": 0.9399460188933872,
     "near_fault_lower_coverage": 1.0,
-    "point_mae_days": 3.6216313105030764,
+    "point_mae_days": 3.9434719837340695,
     "median_lower_days": 0.0,
-    "positive_margin_fraction": 0.3125
+    "positive_margin_fraction": 0.32653061224489793
   },
   "chronological_detection": {
     "name": "health_index_smooth",
     "budget": 72,
-    "alarms": 33,
+    "alarms": 31,
     "n_episodes": 6,
     "detected": 6,
-    "median_lead_d": 14.456677933119213,
+    "median_lead_d": 13.456677933119213,
     "worst_lead_d": 6.050166570844907,
-    "mean_lead_d": 13.170115326259646,
-    "precision": 0.8787878787878788,
-    "median_capture": 0.4352025539550879,
+    "mean_lead_d": 12.670115326259642,
+    "precision": 0.9354838709677419,
+    "median_capture": 0.41341347249670013,
     "worst_capture": 0.19896900628442357,
-    "false_alerts_per_asset_month": 0.041666666666666664,
+    "false_alerts_per_asset_month": 0.020833333333333332,
     "evaluation": "chronological_replay",
     "missed": 0
   },
-  "frozen_alert_threshold": 11.652652516043885,
+  "frozen_alert_threshold": 16.413339472879358,
+  "chronological_duty": {
+    "episodes": 6,
+    "episodes_load_sensitive_before_fault": 6,
+    "median_sensitivity_lead_days": 17.523186199762733,
+    "episodes_restricted_before_fault": 6,
+    "median_restriction_lead_days": 5.576659394699075,
+    "healthy_asset_days_assessed": 2654,
+    "healthy_asset_days_flagged_sensitive": 28,
+    "healthy_asset_days_restricted": 0,
+    "healthy_false_restriction_rate": 0.0,
+    "peak_bands": [
+      [
+        7,
+        10
+      ],
+      [
+        16,
+        20
+      ]
+    ],
+    "note": "Level comparison at peak load; wear-load interaction is a simulator assumption."
+  },
   "selection": {
-    "selection_reason": "inner-group selection",
-    "qualified": true,
+    "selection_reason": "fixed baseline; insufficient qualifying inner validation",
+    "qualified": false,
     "selected": {
       "projection": "loglinear",
-      "mode": "additive",
-      "episode_rows": 101,
-      "scored_rows": 56,
-      "abstention_rate": 0.4455445544554455,
-      "evaluated_groups": 3,
-      "macro_lower_coverage": 0.9327731092436974,
-      "near_fault_lower_coverage": 1.0,
-      "point_mae_days": 4.021304774307902,
-      "median_lower_days": 1.2700882158152353,
-      "positive_margin_fraction": 0.5714285714285714
+      "mode": "additive"
     },
     "candidates": [
       {
         "projection": "linear",
         "mode": "additive",
         "episode_rows": 101,
-        "scored_rows": 50,
-        "abstention_rate": 0.504950495049505,
+        "scored_rows": 51,
+        "abstention_rate": 0.49504950495049505,
         "evaluated_groups": 3,
-        "macro_lower_coverage": 0.9841269841269842,
+        "macro_lower_coverage": 1.0,
         "near_fault_lower_coverage": 1.0,
-        "point_mae_days": 15.02526764213583,
+        "point_mae_days": 16.231846533716308,
         "median_lower_days": 0.0,
-        "positive_margin_fraction": 0.08
+        "positive_margin_fraction": 0.0784313725490196
       },
       {
         "projection": "loglinear",
         "mode": "additive",
         "episode_rows": 101,
-        "scored_rows": 56,
-        "abstention_rate": 0.4455445544554455,
+        "scored_rows": 62,
+        "abstention_rate": 0.38613861386138615,
         "evaluated_groups": 3,
-        "macro_lower_coverage": 0.9327731092436974,
+        "macro_lower_coverage": 0.8962962962962964,
         "near_fault_lower_coverage": 1.0,
-        "point_mae_days": 4.021304774307902,
-        "median_lower_days": 1.2700882158152353,
-        "positive_margin_fraction": 0.5714285714285714
+        "point_mae_days": 4.39453497421256,
+        "median_lower_days": 0.7420063941716961,
+        "positive_margin_fraction": 0.5161290322580645
       },
       {
         "projection": "loglinear",
         "mode": "ratio",
         "episode_rows": 101,
-        "scored_rows": 56,
-        "abstention_rate": 0.4455445544554455,
+        "scored_rows": 62,
+        "abstention_rate": 0.38613861386138615,
         "evaluated_groups": 3,
-        "macro_lower_coverage": 0.8851540616246498,
+        "macro_lower_coverage": 0.8925925925925925,
         "near_fault_lower_coverage": 0.9523809523809523,
-        "point_mae_days": 4.021304774307902,
-        "median_lower_days": 7.6641015063072215,
-        "positive_margin_fraction": 0.9821428571428571
+        "point_mae_days": 4.39453497421256,
+        "median_lower_days": 6.902868519068991,
+        "positive_margin_fraction": 0.9838709677419355
       },
       {
         "projection": "loglinear",
         "mode": "mondrian",
         "episode_rows": 101,
-        "scored_rows": 56,
-        "abstention_rate": 0.4455445544554455,
+        "scored_rows": 62,
+        "abstention_rate": 0.38613861386138615,
         "evaluated_groups": 3,
-        "macro_lower_coverage": 0.8851540616246498,
+        "macro_lower_coverage": 0.8925925925925925,
         "near_fault_lower_coverage": 0.9523809523809523,
-        "point_mae_days": 4.021304774307902,
-        "median_lower_days": 7.6641015063072215,
-        "positive_margin_fraction": 0.9821428571428571
+        "point_mae_days": 4.39453497421256,
+        "median_lower_days": 6.902868519068991,
+        "positive_margin_fraction": 0.9838709677419355
       }
     ]
   },
@@ -111,14 +124,14 @@
   ],
   "group_holdout_rul": {
     "episode_rows": 301,
-    "scored_rows": 182,
-    "abstention_rate": 0.39534883720930236,
+    "scored_rows": 188,
+    "abstention_rate": 0.3754152823920266,
     "evaluated_groups": 9,
-    "macro_lower_coverage": 0.7289577666815519,
+    "macro_lower_coverage": 0.7416570590799265,
     "near_fault_lower_coverage": 1.0,
-    "point_mae_days": 8.873289868180095,
-    "median_lower_days": 2.4324961016975655,
-    "positive_margin_fraction": 0.6263736263736264
+    "point_mae_days": 8.97722953911195,
+    "median_lower_days": 1.1688964754205458,
+    "positive_margin_fraction": 0.5425531914893617
   },
   "group_holdout_selection": [
     {

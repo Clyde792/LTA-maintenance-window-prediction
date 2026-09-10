@@ -81,6 +81,23 @@ deferral time. The unseen-train result falls substantially short of the nominal
 90% lower-bound target; nine simulated fault episodes do not establish dependable
 generalisation. No real-world safety rate is claimed.
 
+## Addendum, later on 10 September: fit-for-duty and regenerated data
+
+After the audit the generator gained a **wear-load interaction** (`load_wear_coeff`
+in `headway/synth/doors.py`): a worn door is disproportionately worse under crowding.
+This is a simulator assumption drawn from operator experience, not a measurement.
+It is what `headway/duty.py` detects. The synthetic data was regenerated with the
+same seed and every artifact rebuilt, so the table above no longer matches
+`data/validation_report.json` exactly. Current figures: chronological 6/6 found,
+6.05 d worst warning, 93.5% precision, 3.9 d MAE, 94.0% coverage (median bound
+still 0 d); entire-train holdout 74.2% coverage, 9.0 d MAE, 37.5% abstention.
+Every headline survived; `SUBMISSION.md` and `TECHNICAL_OVERVIEW.md` carry the
+current numbers. Two design decisions were forced by evidence during the build:
+the sensitivity window was cut from 7 to 3 days after it left restrictions on
+freshly repaired doors, and a margin-based restriction rule was removed after it
+fired on sub-day differences between two bounds and flickered. Test count is
+now 197.
+
 ## What remains
 
 Representative real telemetry, verified failure/inspection semantics, maintenance

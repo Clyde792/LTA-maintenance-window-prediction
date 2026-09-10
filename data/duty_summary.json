@@ -1,0 +1,11 @@
+{
+  "episodes": 9,
+  "episodes_load_sensitive_before_fault": 9,
+  "median_sensitivity_lead_days": 18.970135685266204,
+  "episodes_restricted_before_fault": 6,
+  "median_restriction_lead_days": 3.456677933119213,
+  "healthy_asset_days_assessed": 6444,
+  "healthy_asset_days_flagged_sensitive": 78,
+  "healthy_asset_days_restricted": 0,
+  "healthy_false_restriction_rate": 0.0
+}

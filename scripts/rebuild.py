@@ -6,7 +6,7 @@ def main():
     env=os.environ.copy()
     env["OPENBLAS_NUM_THREADS"]="1"
     env["OMP_NUM_THREADS"]="1"
-    scripts=["build_health.py","build_rul.py","build_aspects.py","build_deferral.py","build_ui.py"]
+    scripts=["build_health.py","build_rul.py","build_aspects.py","build_duty.py","build_deferral.py","build_ui.py"]
     if "--validate" in sys.argv:
         scripts.extend(["validate_pipeline.py","run_tournament.py"])
     for script in scripts:
