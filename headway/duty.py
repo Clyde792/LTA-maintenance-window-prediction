@@ -20,7 +20,7 @@ from .aspect import Aspect, AspectPolicy
 from .rul import HI, ConformalRUL
 
 # Sufficient statistics of (load, cycle index) per asset-day. Trailing sums of
-# these give the pooled within-asset regression exactly, without keeping cycles.
+# day-centered moments give within-day regression without keeping cycles.
 STATS = ("duty_n", "duty_sum_l", "duty_sum_ll", "duty_sum_y", "duty_sum_ly", "duty_sum_yy")
 
 DUTY_LABELS = {
@@ -47,6 +47,8 @@ def cycle_stats(cycles, index="cycle_index", load="load_proxy"):
     l = pd.to_numeric(c[load], errors="coerce").to_numpy(float)
     y = pd.to_numeric(c[index], errors="coerce").to_numpy(float)
     ok = np.isfinite(l) & np.isfinite(y)
+    if "context_supported" in cycles:
+        ok &= cycles.context_supported.fillna(False).to_numpy(bool)
     c = c[ok].assign(l=l[ok], y=y[ok])
     c["ll"], c["ly"], c["yy"] = c.l * c.l, c.l * c.y, c.y * c.y
     g = c.groupby(["asset_id", "day"], as_index=False).agg(
@@ -93,7 +95,11 @@ def format_bands(bands):
 
 
 def load_sensitivity(daily, window_days=3, min_cycles=30, min_load_sd=0.08, min_t=2.5, exit_t=1.5, by="asset_id"):
-    """Trailing pooled regression of cycle index on load, per asset.
+    """Trailing within-day regression of cycle index on load, per asset.
+
+    Remove each day's intercept before pooling: differences in daily wear and
+    mean crowding must not masquerade as within-day sensitivity. The t statistic
+    is an OLS diagnostic, not calibrated significance for correlated cycles.
 
     The window matches the index smoothing window on purpose: the shift is
     estimated over the same days as the level it is applied to, so a repair
@@ -113,18 +119,27 @@ def load_sensitivity(daily, window_days=3, min_cycles=30, min_load_sd=0.08, min_
     out["load_sensitive"] = False
     for _, g in daily.sort_values([by, "day"]).groupby(by, sort=False):
         s = g.set_index(pd.DatetimeIndex(g.day))[list(STATS)].astype(float)
+        # Day fixed effects: center sufficient statistics BEFORE rolling sums.
+        count = s.duty_n.replace(0, np.nan)
+        centered = pd.DataFrame({
+            "xx": (s.duty_sum_ll - s.duty_sum_l ** 2 / count).clip(lower=0),
+            "xy": s.duty_sum_ly - s.duty_sum_l * s.duty_sum_y / count,
+            "yy": (s.duty_sum_yy - s.duty_sum_y ** 2 / count).clip(lower=0),
+            "days": s.duty_n.gt(0).astype(float),
+        }, index=s.index).fillna(0).rolling(f"{window_days}D", min_periods=1).sum()
         w = s.rolling(f"{window_days}D", min_periods=1).sum()
         n, sl, sll, sy, sly, syy = (w[c].to_numpy() for c in STATS)
         with np.errstate(invalid="ignore", divide="ignore"):
-            sxx = sll - sl * sl / n
-            sxy = sly - sl * sy / n
-            syy_c = syy - sy * sy / n
+            sxx = centered.xx.to_numpy()
+            sxy = centered.xy.to_numpy()
+            syy_c = centered.yy.to_numpy()
             b = sxy / sxx
-            resid_var = np.maximum(syy_c - b * sxy, 0.) / np.maximum(n - 2, 1)
+            dof = n - centered.days.to_numpy() - 1
+            resid_var = np.maximum(syy_c - b * sxy, 0.) / np.maximum(dof, 1)
             t = b / np.sqrt(resid_var / sxx)
             load_sd = np.sqrt(sxx / n)
             mean_load = sl / n
-        usable = np.isfinite(b) & (n >= min_cycles) & (load_sd >= min_load_sd)
+        usable = np.isfinite(b) & (dof > 0) & (n >= min_cycles) & (load_sd >= min_load_sd)
         enter = usable & (b > 0) & (t >= min_t)
         stay = usable & (b > 0) & (t >= exit_t)
         days = g.day.to_numpy()
@@ -178,6 +193,10 @@ class DutyAssessor:
 
 def _duty(r, threshold):
     base_state, peak_state = r.prediction_state, r.peak_state
+    # A held escalation is not fresh evidence. Check the raw state, not just
+    # the damped aspect, which deliberately remains elevated through gaps.
+    if base_state not in {"valid", "threshold_exceeded", "no_worsening_trend"}:
+        return "not_assessed", "base estimate unavailable; retain the existing maintenance escalation"
     if base_state == "threshold_exceeded":
         return "withdraw", "day-average index at or beyond the failure level"
     if r.aspect == Aspect.UNKNOWN or not np.isfinite(r.load_sensitivity):

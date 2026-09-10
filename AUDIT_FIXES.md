@@ -102,6 +102,15 @@ now 197.
 
 ## What remains
 
+### Subsequent continuation review
+
+The new duty module was corrected to use within-day centered regression rather
+than pooled between-day contrasts, exclude unsupported cycles, and abstain on
+unknown current evidence even when an escalation is retained. Zero/one-episode
+simulation now works. Dashboard lower margins no longer round upward or claim
+"safe time". Windows artifact checking now uses UTF-8. The suite passes 206 tests;
+see [the continuation review](CONTINUATION_REVIEW.md) for details and remaining gaps.
+
 Representative real telemetry, verified failure/inspection semantics, maintenance
 and censoring records, and operator-specific action policy are still required.
 Unseen-asset onboarding and calibration need further experiments. A conditional

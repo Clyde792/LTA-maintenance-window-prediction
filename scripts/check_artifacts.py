@@ -14,6 +14,7 @@ def main():
     unknown=~d.prediction_state.isin(["valid","threshold_exceeded","no_worsening_trend"])
     assert not d.loc[unknown,"aspect"].eq(0).any(), "unknown evidence displayed as green"
     assert d.loc[unknown,"rul_lower"].isna().all()
+    assert d.loc[unknown,"duty"].eq("not_assessed").all(), "unknown evidence received a duty assessment"
     assert d.available_at.eq(d.day+pd.Timedelta(days=1)).all()
     for h in (0.,3.,7.,14.,28.):
         expected=[compare_window(m,s,h) for m,s in zip(d.rul_lower,d.prediction_state)]
@@ -26,7 +27,7 @@ def main():
     assert len(payload["assets"])==d.asset_id.nunique()
     assert 'data-theme="light"' in html
     assert "riskCeiling" not in html and "Latest date under 10% risk" not in html
-    assert "Safe time left" in html and "simulated" in payload["scope"].lower()
+    assert "Estimated lower margin" in html and "simulated" in payload["scope"].lower()
     for asset in payload["assets"]:
         for row in asset["rows"]:
             assert set(row["windows"].values())<={"unknown","within_margin","exceeds_margin","no_positive_margin","threshold_exceeded"}
@@ -37,7 +38,19 @@ def main():
     scripts=re.findall(r'<script>(.*?)</script>',html,re.S)
     assert scripts
     for script in scripts:
-        subprocess.run([node,"--check"],input=script,text=True,check=True,capture_output=True)
+        subprocess.run([node,"--check"],input=script,text=True,encoding="utf-8",
+                       check=True,capture_output=True,timeout=30)
+    # Exercise the actual rendered card expression, not a second formatter.
+    expression=re.search(r"const safe=(.*?);", "\n".join(scripts)).group(1)
+    probe="const format=(r)=>" + expression + ";\n" + """
+    for (const margin of [1.96, 2.99, 10.09]) {
+      const shown=Number(format({margin}).match(/[0-9]+(?:\\.[0-9]+)?/)[0]);
+      if (shown > margin) throw new Error('display overstates lower margin');
+    }
+    if (format({margin:0}) !== 'no positive margin') throw new Error('zero margin mislabelled');
+    """
+    subprocess.run([node],input=probe,text=True,encoding="utf-8",
+                   check=True,capture_output=True,timeout=30)
     print(f"Artifact checks passed: {len(d)} rows, {len(payload['assets'])} assets, matching window states, valid JavaScript.")
     return 0
 

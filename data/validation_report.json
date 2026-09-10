@@ -34,11 +34,11 @@
   "chronological_duty": {
     "episodes": 6,
     "episodes_load_sensitive_before_fault": 6,
-    "median_sensitivity_lead_days": 15.601226038454861,
+    "median_sensitivity_lead_days": 15.101226038454861,
     "episodes_restricted_before_fault": 6,
     "median_restriction_lead_days": 2.093415958912037,
-    "healthy_asset_days_assessed": 2654,
-    "healthy_asset_days_flagged_sensitive": 56,
+    "healthy_asset_days_assessed": 2647,
+    "healthy_asset_days_flagged_sensitive": 45,
     "healthy_asset_days_restricted": 0,
     "healthy_false_restriction_rate": 0.0,
     "peak_bands": [

@@ -87,6 +87,9 @@ in simulation; reliable 90% lower-bound coverage remains unresolved.
 
 ## Remaining evidence needed
 
+See [the continuation review](CONTINUATION_REVIEW.md) for corrections to the new
+fit-for-duty feature and the remaining model, planner and simulator limitations.
+
 Real telemetry with verified units, maintenance history, failure/inspection semantics,
 censored follow-up, representative operating conditions and enough independent
 fault episodes. Survival models and operator-specific scheduling should be evaluated

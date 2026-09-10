@@ -146,8 +146,8 @@ def generate(cfg: SynthConfig | None = None) -> tuple[pd.DataFrame, pd.DataFrame
     # "today" always shows doors mid-degradation or freshly repaired - the
     # realistic fleet snapshot, and a non-empty first screen. Drawn last so the
     # rest of the degradation plan is identical to the base generator.
-    n_recent = max(2, cfg.n_episodes // 4)
-    late = np.argsort(fault_day)[-n_recent:]
+    n_recent = min(cfg.n_episodes, max(2, cfg.n_episodes // 4))
+    late = np.argsort(fault_day)[-n_recent:] if n_recent else np.array([], dtype=int)
     fault_day[late] = cfg.n_days - rng.uniform(0.5, 4.5, n_recent)
     onset_day[late] = np.maximum(fault_day[late] - onset_lead_raw[late], cfg.min_healthy_days)
     onset_lead[late] = fault_day[late] - onset_day[late]

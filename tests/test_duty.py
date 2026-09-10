@@ -17,16 +17,43 @@ def _cycles(b, n=200, seed=0):
                          "cycle_index": 1.0 + b * load + rng.normal(0, .5, n)})
 
 
-def test_sufficient_statistics_reproduce_pooled_regression():
+def test_sufficient_statistics_reproduce_within_day_regression():
     c = _cycles(4.)
     stats = cycle_stats(c)
     assert set(STATS) <= set(stats)
     daily = stats.assign(asset_id="A")
     out = load_sensitivity(daily, window_days=3, min_cycles=10)
     last = out.sort_values("day").iloc[-1]
-    ref = np.polyfit(c.load_proxy, c.cycle_index, 1)[0]
+    centered = c[["load_proxy", "cycle_index"]] - c.groupby(c.ts.dt.floor("D"))[["load_proxy", "cycle_index"]].transform("mean")
+    ref = np.polyfit(centered.load_proxy, centered.cycle_index, 1)[0]
     assert last.load_sensitivity == pytest.approx(ref, rel=1e-6)
     assert last.load_sensitive
+
+
+def test_daily_wear_and_crowding_changes_do_not_create_sensitivity():
+    frames = []
+    for day in range(3):
+        frames.append(pd.DataFrame({"asset_id": "A",
+            "ts": pd.Timestamp("2026-01-01") + pd.Timedelta(days=day) + pd.to_timedelta(np.arange(100), unit="m"),
+            "load_proxy": day * .3 + np.linspace(0, .1, 100),
+            "cycle_index": np.full(100, day * 10.)}))
+    out = load_sensitivity(cycle_stats(pd.concat(frames)), min_load_sd=.01)
+    assert not out.load_sensitive.any()
+    assert np.allclose(out.load_sensitivity, 0.)
+
+
+def test_unsupported_cycles_do_not_supply_load_evidence():
+    c = _cycles(4.).assign(context_supported=False)
+    assert cycle_stats(c).empty
+
+
+@pytest.mark.parametrize("state", ["insufficient_data", "stale_data", "outside_training_conditions", "uncalibrated"])
+def test_held_escalation_with_unknown_evidence_is_not_duty_clearance(state):
+    from types import SimpleNamespace
+    from headway.duty import _duty
+    row = SimpleNamespace(prediction_state=state, peak_state=state, aspect=3,
+                          load_sensitivity=2., load_sensitive=False)
+    assert _duty(row, 10.)[0] == "not_assessed"
 
 
 def test_no_slope_is_not_sensitive_and_negative_slope_is_not_sensitive():

@@ -25,8 +25,24 @@ organised around that, because it is also what makes the numbers believable.
 
 The dashboard opens on **Status** - the doors needing action tonight - with
 **Review** (recently flagged, now recovered or awaiting a slot), a **Planner**
-that orders tonight's jobs by priority, a **Fleet** grid, and a **Door detail**
+that holds tonight's engineering window, a **Fleet** grid, and a **Door detail**
 view whose wear chart doubles as the date scrubber.
+
+The Planner is where a decision gets recorded rather than just displayed. Jobs go
+in from Status, get ordered, and close with **Done**. Anything not closed
+**carries to the next night by itself**, tagged with how late it now is — and
+priced against the same lower bound the card shows:
+
+```
+TRN025-DOOR-2   WITHDRAW · at least 41.7 d
+   carried from 2026-07-26 · 3 nights late
+   Another night is still inside the estimated lower margin.
+```
+
+That is the honest version of the survival curve the audit removed: no
+probability, just *this delay is, or is not, inside the estimated margin*. We do
+not estimate repair durations — no repair-time data exists in the contract, and
+inventing one would be the same mistake.
 
 Every door gets a **signal aspect** in the four-aspect language railways already
 use — GREEN `MONITOR` / DOUBLE AMBER `PLAN` / AMBER `TONIGHT` / RED `WITHDRAW` —
@@ -94,7 +110,7 @@ timeline); test on everything after.
 | Lower-bound coverage / near-fault | 97.4% / 100% |
 | Abstention on degradation rows | 13.8% |
 | Doors restricted to off-peak before the fault | **6 / 6**, median 2 days ahead |
-| Healthy asset-days wrongly restricted | **0** of 2,654 |
+| Healthy asset-days wrongly restricted | **0** of 2,647 assessed |
 
 Read alongside the number we are least happy with: the **median lower margin is
 0 days**, and only 34% of scored rows carry a *positive* lower bound. Coverage of
@@ -128,7 +144,7 @@ fixable — see below.
 ### The tournament does not crown a winner
 
 Under the same chronological replay (threshold frozen before the cutoff, daily
-alert capacity, cooldown): the raw fleet threshold still **misses 2 of 6** and
+alert capacity, cooldown): the raw fleet threshold **misses 1 of 6** and
 its worst warning is 0 days. Every model fed the *normalised* features finds all
 six with ~6 days minimum warning and clusters within a few points of each other
 — PCA, Mahalanobis, LOF and our directional score are all at 0.021
@@ -207,7 +223,7 @@ operator decision-record are future extensions, not claims.
 ## Try it
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m pytest tests -q          # 197 tests
+.\.venv\Scripts\python.exe -B -m pytest tests -q          # 206 tests
 .\.venv\Scripts\python.exe -B scripts\rebuild.py --validate
 ```
 

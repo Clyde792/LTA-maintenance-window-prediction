@@ -42,8 +42,9 @@ module speaks. Real vendor data binds through **one adapter file**
 
 - **Design choice:** the signal/context split *is* the modelling thesis. Signals
   degrade; context (temperature, crowding, hour) is what we normalise *against*.
-- **Why it matters:** on Friday 18 Sep, binding real data is a 30-minute mapping
-  exercise, not a refactor. `scripts/bind_data.py` even guesses the mapping.
+- **Why it matters:** `scripts/bind_data.py` proposes mappings, but real integration
+  also requires verified units, identities, cycle boundaries and label semantics.
+  There is no established time estimate for that work.
 - **Weakness:** the guessed column names and the bogie signal list are
   literature-based assumptions. If the real schema is very different, the adapter
   gets bigger.
@@ -67,11 +68,12 @@ Each door has its own build tolerance. This subtracts each asset's own reference
 median and divides by its robust scale, giving a **health index in sigma units**
 — comparable across doors, fleets and subsystems.
 
-- **This is the single biggest contributor** to detection quality: it is what
-  takes the tournament from "misses 2 of 6" to "finds all 6".
-- **Weakness — and it is the important one:** the reference window is assumed
-  healthy. For a train Headway has never seen, that assumption is contaminated,
-  and coverage drops to 74% (see §3). The onboarding adapter (§4) is the fix.
+- **Evidence:** the raw threshold finds five of six future episodes, while the
+  normalised models find six. This comparison does not isolate the contribution
+  of per-asset baselines from the other preprocessing stages.
+- **Weakness:** the reference window is assumed healthy. Unseen trains use a
+  fleet fallback, which may misrepresent an individual asset's location and scale.
+  Onboarding is a promising experiment, not an established calibration fix.
 
 ### 2.4 Multivariate health index — `headway/normalise.py` (`MultivariateHealthIndex`)
 
@@ -159,8 +161,10 @@ load** — it holds together at 14:00 and fails at 08:15.
   healthy door shows. What remains for a worn door is an *excess* sensitivity:
   the cycle-level index rises with crowding more than the fleet model expects.
   The pipeline keeps six sufficient statistics of (load, index) per asset-day;
-  their trailing 3-day sums give the pooled within-asset regression exactly. The
-  slope must be positive and significant (t ≥ 2.5) before it is used at all.
+  moments are centered separately per day before pooling over three days, so
+  between-day wear and crowding changes cannot create spurious sensitivity.
+  The positive slope must pass an OLS t diagnostic (entry ≥ 2.5, exit < 1.5).
+  Correlated cycles mean this is not calibrated statistical significance.
 - **What is done with it.** The index is shifted to the reference **peak load**
   (the 90th-percentile crowding inside the peak bands, which are themselves
   derived from the reference load profile, not hard-coded), and the card's own
@@ -177,10 +181,9 @@ load** — it holds together at 14:00 and fails at 08:15.
   already 0 there; as an aspect escalation the feature was vacuous. The level
   comparison is where the peak signal actually is. On the chronological holdout
   (trained before 24 June, six future episodes) all six doors are restricted
-  before the fault, median 5.6 days ahead, with 0 of 2,654 healthy asset-days
-  restricted; in the retrospective demo 6 of 9, median 3.5 days. The
-  restriction is contiguous and runs straight into *withdraw* — a first version
-  flickered on and off, which is what killed the margin rule.
+  before the fault, median 2.09 days ahead, with 0 of 2,647 assessed healthy
+  asset-days restricted; in the retrospective demo 8 of 9, median 2.17 days.
+  Earlier margin-based restrictions flickered, motivating the level rule.
 - **Weakness, stated plainly:** the wear-load interaction is a *simulator
   assumption* (`load_wear_coeff` in `headway/synth/doors.py`), chosen from
   operator experience, not measured. The peak projection reuses the fleet
@@ -201,9 +204,28 @@ Four views, plain-language throughout:
 - **Review** — doors flagged in the trailing three weeks that are *not* on Status:
   recently escalated and now recovered ("confirm the repair held"), or sitting at
   the plan-ahead level.
-- **Planner** — for a chosen engineering-window date, the candidate jobs as an
-  ordered priority list; reorder with the arrows, defer below the line, choices
-  saved per date in the browser.
+- **Planner** — the engineering window for a chosen night, and the only place a
+  decision is *recorded*. A **job** is the operator's object, not the model's:
+  `open` (flagged, uncommitted) → `planned` (committed to a night) → `done`.
+  Jobs are added from Status or from the Planner's own "flagged, not planned"
+  list, reordered with the arrows, and closed with **Done**. A planned job that
+  was never marked done **carries forward on its own** — it reappears on every
+  later night tagged *carried from <date> · N nights late*, until someone closes
+  it. Job state is keyed by door, not by date, and lives in the browser; in a
+  real deployment it belongs in the operator's work-order system.
+- **What a rollover costs.** A carried job is priced against the *same* lower
+  bound the card shows: "another night is still inside the estimated lower
+  margin", or "no positive margin left — another night is outside it". No new
+  quantity is invented, and the two can never disagree. A job whose escalation is
+  *held* (retained from an earlier day because current evidence cannot clear it)
+  says so, and prints what today's evidence alone would give — otherwise a
+  `WITHDRAW` job carrying a large margin reads as a contradiction.
+- **Deliberately absent: job durations.** There is no repair-time data anywhere in
+  the contract, and `fault_mode` only exists *at* the confirmed fault, so a
+  duration cannot be inferred from telemetry. Standard job times are an operator
+  input, and whether the maintenance records carry work start/end timestamps is a
+  site-visit question. Until one of those lands, the Planner counts jobs and does
+  not pretend to budget minutes.
 - **Door detail** — the wear-level chart *is* the date scrubber (drag it), with a
   fault-level line, the full card at that day, and a Back button.
 
@@ -229,7 +251,7 @@ faults confirmed by 24 June; test on later observations.
 | RUL point error | 3.5 d MAE | — |
 | Lower-bound coverage | 97.4% | median bound is **0 days**; only 34% positive |
 | Abstention on degradation rows | 13.8% | — |
-| Restricted to off-peak before the fault | 6 / 6 | median 2 d ahead; 0 of 2,654 healthy asset-days restricted |
+| Restricted to off-peak before the fault | 6 / 6 | median 2 d ahead; 0 of 2,647 healthy asset-days restricted |
 
 **Whole train held out (stricter).** Refit *everything* with an entire train
 removed, for each of 9 fault trains.
@@ -243,7 +265,7 @@ removed, for each of 9 fault trains.
 The stricter test **misses the target**, and the dashboard says so.
 
 **The tournament** (`scripts/run_tournament.py`) does not crown a winner: under
-chronological replay with a frozen threshold, the raw fleet threshold misses 2
+chronological replay with a frozen threshold, the raw fleet threshold misses 1
 of 6 and every normalised model finds all 6 and clusters together.
 
 **Four corrections during the build** (each with its measurement, in
@@ -259,8 +281,9 @@ of 6 and every normalised model finds all 6 and clusters together.
 
 ## 4. The generalisation gap and the fix — `headway/onboarding.py`
 
-The 74% held-out coverage has one cause: an unseen train's per-asset baseline is
-estimated from contaminated data. A 21-day per-asset reference adapter (fleet
+The held-out coverage gap is consistent with a mismatch between fleet fallback
+baselines and individual assets; the experiments do not establish a single cause.
+A 21-day per-asset reference adapter (fleet
 models stay frozen) halves point error (9.0 → 4.6 d) and lifts coverage to
 87–90%. **It replicates on a fresh simulator seed** (`ONBOARDING_RESULTS.md`).
 
@@ -287,7 +310,7 @@ an operator question and a site-visit question.
 
 | | severity | status |
 |---|---|---|
-| **74% held-out coverage** vs 90% target | high | fix exists (onboarding), not shipped; needs operator input |
+| **75.8% held-out coverage** vs 90% target | high | onboarding is experimental; coverage remains unresolved |
 | **Median lower bound = 0 days** on the chronological split | high | honest but often unschedulable; the bound is conservative by construction |
 | **9 synthetic episodes** | high | nothing about generalisation is established; the effective sample size is *groups*, not daily rows |
 | **No calibrated probability** | medium | deliberate — but it means the "wow" deferral feature is now a label |

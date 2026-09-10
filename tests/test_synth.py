@@ -193,3 +193,9 @@ def test_wear_and_load_interact(cycles, episodes):
     assert worn, "no episode had enough near-fault cycles"
     assert float(np.mean(worn)) > 1.3 * load_effect(healthy), (
         f"near-fault load effect {np.mean(worn):.3f} must exceed healthy {load_effect(healthy):.3f}")
+@pytest.mark.parametrize("n_episodes", [0, 1])
+def test_small_episode_count_can_generate(n_episodes):
+    cycles, episodes = generate(SynthConfig(n_trains=2, doors_per_train=2,
+        n_days=90, cycles_per_day=10, n_episodes=n_episodes, seed=7))
+    assert len(cycles) > 0
+    assert len(episodes) == n_episodes
