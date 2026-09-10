@@ -1,0 +1,22 @@
+{
+  "arms": [
+    "fleet_pooled",
+    "onboard_pooled",
+    "onboard_balanced",
+    "onboard_ratio"
+  ],
+  "asset_reference_days": 21,
+  "fleet_reference_days": 30,
+  "alpha": 0.1,
+  "projection": "loglinear",
+  "replication_seed": 20260910,
+  "selection": "none; fixed paired comparisons, no automatic promotion",
+  "script_sha256": "112e6a03cd1bec431d256bbd36865ad7b3696bfa0e47bf9be1a3d2bb61466783",
+  "limitations": [
+    "Existing fleet was already inspected; this is development evidence.",
+    "New seed uses the same simulator family, not real or external fleet validation.",
+    "Onboarding assumes the initial reference is suitable; completeness does not establish health.",
+    "Group-balanced quantiles are empirical; no conformal or conditional probability guarantee.",
+    "Train holdout uses other trains' later outcomes; only new_train_future also enforces time cutoff."
+  ]
+}

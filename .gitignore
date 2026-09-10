@@ -1,6 +1,10 @@
 .venv/
+.audit-backup/
+.pytest_cache/
+data/*.joblib
 __pycache__/
 *.pyc
 data/*.parquet
 .ipynb_checkpoints/
 data/_demo_vendor_export.csv
+data/onboarding_experiment/*.parquet

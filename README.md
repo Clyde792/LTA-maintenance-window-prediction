@@ -68,6 +68,15 @@ Conformal-style rank corrections do not remove correlation between episode-days.
 The residual bounds are empirical, and their nominal level does not imply an
 individual door's conditional failure probability.
 
+## Experimental new-asset onboarding
+
+An optional 21-day reference adapter and fixed calibration comparisons are available
+in `headway/onboarding.py`, `headway/calibration_experiments.py` and
+`scripts/experiment_onboarding.py`. They are not enabled in the demo by default.
+See [the experiment report](ONBOARDING_RESULTS.md) for replicated results, sample
+counts, limitations and reproduction commands. Onboarding improved point estimates
+in simulation; reliable 90% lower-bound coverage remains unresolved.
+
 ## Remaining evidence needed
 
 Real telemetry with verified units, maintenance history, failure/inspection semantics,
