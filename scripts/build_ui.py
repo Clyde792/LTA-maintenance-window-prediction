@@ -1,14 +1,30 @@
-"""Render a light dashboard from the current retrospective demo pipeline."""
-import json,sys
+"""Render the dashboard from the current retrospective demo pipeline.
+
+The page is emitted as one self-contained HTML file, but the source is not: the
+shell, stylesheet and script live under scripts/ui/ so they can be read and
+reviewed as ordinary files. This module only builds the payload and inlines them.
+"""
+import hashlib,json,sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from headway.aspect import RECOMMENDATION,AspectPolicy
 from headway.deferral import DEFAULT_HORIZONS,horizon_key
+from headway.evidence import evidence_status
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
+UI=Path(__file__).resolve().parent/"ui"
 OUT=ROOT/"ui/headway.html"
+
+def source_artifact(path):
+    """Identity of the TELEMETRY ARTIFACT, not of a trained model.
+
+    A dataset hash says which frame a number was computed from. It does not
+    identify the fitted normalisation or failure model, and must never be
+    labelled as if it did.
+    """
+    return "sha256:"+hashlib.sha256(Path(path).read_bytes()).hexdigest()[:16]
 
 def _clean(v):
     return round(float(v),3) if v is not None and pd.notna(v) and np.isfinite(v) else None
@@ -20,6 +36,153 @@ FRIENDLY_MEANING={-1:"Check the data or inspect — no reliable countdown.",
 SIGNAL_NAMES={"current_integral_as":"Motor charge per cycle","cycle_duration_s":"Cycle time",
     "peak_current_a":"Peak current","mean_current_a":"Average current","travel_mm":"Door travel"}
 
+# Illustrative operator inputs, NOT model outputs. Nothing in the telemetry
+# implies how long a repair takes, how many crews a depot fields, or when the
+# engineering window opens; fault_mode only exists at the confirmed fault. These
+# are depot facts to be confirmed on site, and the dashboard labels them as such.
+WINDOW={"startHour":1.0,"minutes":120,"crew":1,"defaultJobMinutes":45}
+
+def _visible_from(as_of,days):
+    """First replay night at which an assessment may be shown.
+
+    A day's aggregate only lands the following midnight, so the dashboard's clock
+    on night i is days[i] + 1 day. An assessment must never appear before its own
+    `as_of`, or the replay would show knowledge nobody had yet.
+    """
+    t=pd.Timestamp(as_of)
+    t=t.tz_convert("Asia/Singapore").tz_localize(None) if t.tzinfo is not None else t
+    for i,d in enumerate(days):
+        if pd.Timestamp(d)+pd.Timedelta(days=1)>=t: return i
+    return None
+
+# The reference snapshot is large and already persisted in the store; the page
+# carries its id and hash for provenance instead of the whole thing.
+_DROP={"reference_snapshot"}
+
+def _verification(days):
+    path=DATA/"verification_export.json"
+    if not path.exists(): return None
+    v=json.loads(path.read_text(encoding="utf-8"))
+    out=[]
+    for a in v.get("assessments",[]):
+        a={k:x for k,x in a.items() if k not in _DROP}
+        a["visibleFrom"]=_visible_from(a["as_of"],days)
+        out.append(a)
+    v["assessments"]=out
+    return v
+
+def _unavailable(reason,problems):
+    """A BUILD-WIDE rebuild-required state, rendered by the page.
+
+    Reserved for failures that make the whole export untrustworthy - currently
+    only a source-artifact mismatch. A single door that could not be assessed is
+    a per-door fact and must not take the other doors' evidence down with it.
+    """
+    return {"unavailable":True,"reason":reason,"problems":problems,"records":[],
+            "unavailableDoors":{},"doorProblems":[],
+            "suggestions":{},"explanationOrderNames":[],"staleAfterDays":0}
+
+# Reason codes this build knows how to CHECK. An export may not invent one: an
+# unverifiable claim is a way to skip a door out of the completeness check.
+UNAVAILABLE_REASONS={"no_supported_assessment"}
+
+def _verify_unavailable(claim,frame,door):
+    """Confirm an unavailable claim against the telemetry now being built.
+
+    The exporter's word is not enough. A door is only accepted as unassessable
+    if this build's own frame agrees that it never had a supported aggregate.
+    """
+    code=claim.get("reasonCode")
+    if code not in UNAVAILABLE_REASONS:
+        return False,(f"unrecognised unavailable reason code {code!r}; this build can only "
+                      f"verify {sorted(UNAVAILABLE_REASONS)}")
+    if not str(claim.get("reason") or "").strip():
+        return False,"unavailable entry carries no reason to show"
+    nights=supported_nights(frame[frame.asset_id==door])
+    if len(nights):
+        return False,(f"claims no supported assessment, but this build's telemetry has "
+                      f"{len(nights)} supported night(s) for this door")
+    return True,None
+
+def _inspection(days,source,expected_doors,frame):
+    """Inline the build-time evidence export, validated against THIS build.
+
+    An export is only evidence about the frame it was computed from. Checked
+    here, at the moment the page is assembled, rather than by a separate script
+    that inspects whatever files happen to be on disk afterwards:
+
+      * the export must name the same source artifact, by name AND by hash, as
+        the frame this page is being built from;
+      * every record must carry that same export identity, or it is dropped;
+      * the door set must match the selection these very rules produce.
+
+    Any mismatch yields an explicit unavailable/rebuild-required state instead
+    of stale evidence presented as current.
+    """
+    path=DATA/"inspection_evidence_export.json"
+    if not path.exists(): return None
+    v=json.loads(path.read_text(encoding="utf-8"))
+    actual=source_artifact(source)
+    problems=[]
+    if v.get("source")!=Path(source).name:
+        problems.append(f"export was built from {v.get('source')!r}, this page from {Path(source).name!r}")
+    if v.get("sourceArtifact")!=actual:
+        problems.append(f"source artifact hash differs: export {v.get('sourceArtifact')!r}, "
+                        f"this build {actual!r}")
+    if problems:
+        return _unavailable("the exported evidence was computed from different telemetry",problems)
+    # Identity is per record: one record from another export does not condemn
+    # the rest, but it is never shown.
+    by_door,door_problems={},[]
+    for r in v.get("records",[]):
+        if r.get("source")!=v.get("source") or r.get("sourceArtifact")!=v.get("sourceArtifact"):
+            door_problems.append(f"{r.get('assetId')}: a record does not carry this export's "
+                                 "identity and was dropped")
+            continue
+        r["visibleFrom"]=_visible_from(r["asOf"],days)
+        by_door.setdefault(r["assetId"],[]).append(r)
+
+    claimed={e.get("assetId"):e for e in v.get("unavailableDoors",[]) if e.get("assetId")}
+    expected=set(expected_doors)
+    kept,unavailable_doors=[],{}
+    # Every surfaced door must be explained: assessed, or declared unassessable
+    # with a reason this build can verify. Neither is an omission.
+    for door in sorted(expected):
+        records,claim=by_door.get(door),claimed.get(door)
+        if records and claim:
+            door_problems.append(f"{door}: the export both assessed this door and declared it "
+                                 "unassessable; neither entry is trusted")
+            unavailable_doors[door]={"reasonCode":"conflicting_entries",
+                "reason":"The export contains both assessment records and an unavailable entry "
+                         "for this door, so neither was used. Rebuild required."}
+        elif records:
+            kept+=records
+        elif claim:
+            ok,why=_verify_unavailable(claim,frame,door)
+            if ok:
+                unavailable_doors[door]={"reasonCode":claim["reasonCode"],
+                                         "reason":str(claim["reason"])}
+            else:
+                door_problems.append(f"{door}: {why}")
+                unavailable_doors[door]={"reasonCode":"unverified_claim",
+                    "reason":"The export declared this door unassessable, but this build could "
+                             f"not confirm it: {why}. Rebuild required."}
+        else:
+            door_problems.append(f"{door}: surfaced by this build, but the export neither "
+                                 "assessed it nor explained why")
+            unavailable_doors[door]={"reasonCode":"unexplained_omission",
+                "reason":"This door is shown by Status or Review, but the exported evidence "
+                         "neither assessed it nor recorded why. Rebuild required."}
+    for door in sorted((set(by_door)|set(claimed))-expected):
+        door_problems.append(f"{door}: not surfaced by this build; its entries were dropped")
+
+    v["records"]=kept
+    v["unavailableDoors"]=unavailable_doors
+    v["doorProblems"]=door_problems
+    v["unavailable"]=False
+    v.pop("skipped",None)
+    return v
+
 def _why(r):
     out=[]
     hi=r.get("health_index_smooth"); sl=r.get("health_index_slope")
@@ -28,49 +191,143 @@ def _why(r):
         out.append(f"rising ~{sl:.1f} a day" if sl>0.05 else f"falling ~{abs(sl):.1f} a day" if sl<-0.05 else "roughly flat now")
     return [", ".join(out)] if out else []
 
+# Mirrors RVWIN in scripts/ui/app.js: the Review view's look-back window.
+REVIEW_WINDOW=21
+
+def _asset_rows(g,contribs):
+    """The rows the page actually receives for one asset, already reindexed."""
+    rows=[]
+    last_aspect=-1
+    last_supported=None
+    for d,r in g.iterrows():
+        monitoring=evidence_status(r,as_of=pd.Timestamp(d)+pd.Timedelta(days=1),last_supported=last_supported)
+        last_supported=monitoring["lastSupportedAt"]
+        state=r.get("prediction_state")
+        if pd.isna(state): state="missing_observation"
+        asp=int(r.aspect) if pd.notna(r.get("aspect")) else (last_aspect if last_aspect>0 else -1)
+        last_aspect=asp
+        raw=int(r.raw_aspect) if pd.notna(r.get("raw_aspect")) else -1
+        if monitoring["status"] != "supported":
+            asp=asp if asp>0 else -1
+            raw=-1
+            if state != "missing_observation":
+                state="evidence_"+monitoring["status"]
+        rows.append({"aspect":asp,"raw":raw,"state":state,
+            "monitoring":monitoring,
+            "margin":_clean(r.get("rul_lower")),"point":_clean(r.get("rul_point")),
+            "hi":_clean(r.get("health_index_smooth")),"slope":_clean(r.get("health_index_slope")),
+            "stability":r.get("decision_stability") if pd.notna(r.get("decision_stability")) else "n/a",
+            "evidence":_why(r),"windows":{str(int(h)):(r.get(horizon_key(h)) if pd.notna(r.get(horizon_key(h))) else "unknown") for h in DEFAULT_HORIZONS},
+            "baseline":r.get("baseline_source") if pd.notna(r.get("baseline_source")) else "unavailable",
+            "duty":r.get("duty") if pd.notna(r.get("duty")) else "not_assessed",
+            "peakHi":_clean(r.get("peak_index")),"offHi":_clean(r.get("offpeak_index")),
+            "loadT":_clean(r.get("load_sensitivity_t")),"sensitive":bool(r.get("load_sensitive")) if pd.notna(r.get("load_sensitive")) else False,
+            "contributions":{c.removeprefix("contribution_"):_clean(r[c]) for c in contribs}})
+        if monitoring["status"] != "supported":
+            rows[-1].update(margin=None,point=None,hi=None,slope=None,evidence=[],
+                            duty="not_assessed",peakHi=None,offHi=None,loadT=None,sensitive=False,
+                            contributions={c:None for c in rows[-1]["contributions"]},
+                            windows={str(int(h)):"unknown" for h in DEFAULT_HORIZONS})
+    return rows
+
+def display_rows(df):
+    """Every asset's rendered rows, keyed by asset id, plus the replay days.
+
+    This is the ONLY derivation of what the dashboard shows. The evidence
+    exporter selects doors from these rows, not from the raw artifact, so
+    unknown states introduced here - an unsupported day forcing aspect to -1
+    and duty to not_assessed - are accounted for by construction.
+    """
+    days=pd.date_range(df.day.min(),df.day.max(),freq="D")
+    contribs=[c for c in df if c.startswith("contribution_")]
+    return {aid:_asset_rows(g.set_index("day").reindex(days),contribs)
+            for aid,g in df.groupby("asset_id",sort=True)},days
+
+def surfaced(rows,review_window=REVIEW_WINDOW):
+    """True when Status or Review would list this door. Mirrors app.js exactly:
+
+        statusAssets: aspect >= 2 or aspect === -1 or duty === 'off_peak_only'
+        reviewAssets: aspect === 1, or held (aspect > 0 and aspect > raw), or
+                      aspect >= 2 / duty off_peak_only inside the window
+    """
+    if not rows: return False
+    r=rows[-1]
+    if r["aspect"]>=2 or r["aspect"]==-1 or r["duty"]=="off_peak_only": return True
+    if r["aspect"]==1 or (r["aspect"]>0 and r["aspect"]>r["raw"]): return True
+    return any(x["aspect"]>=2 or x["duty"]=="off_peak_only"
+               for x in rows[max(0,len(rows)-review_window):])
+
+def supported_nights(g):
+    """Replay nights on which this door had a supported daily aggregate.
+
+    The predicate behind a door being assessable at all. It lives here, beside
+    the display rules, so the evidence exporter and this validator share one
+    definition instead of each asserting their own.
+    """
+    s=g[g.data_quality_ok.eq(True)&g.context_supported.eq(True)]
+    return pd.to_datetime(s.sort_values("day").available_at)
+
+def surfaced_assets(df):
+    rows,_=display_rows(df)
+    return sorted(a for a,r in rows.items() if surfaced(r))
+
 def build_payload(df,policy):
-    days=sorted(df.day.unique())
+    per_asset,days=display_rows(df)
     assets=[]
     for aid,g in df.groupby("asset_id",sort=True):
-        g=g.set_index("day").reindex(days)
-        rows=[]
-        last_aspect=-1
-        for d,r in g.iterrows():
-            state=r.get("prediction_state")
-            if pd.isna(state): state="missing_observation"
-            asp=int(r.aspect) if pd.notna(r.get("aspect")) else (last_aspect if last_aspect>0 else -1)
-            last_aspect=asp
-            raw=int(r.raw_aspect) if pd.notna(r.get("raw_aspect")) else -1
-            rows.append({"aspect":asp,"raw":raw,"state":state,
-                "margin":_clean(r.get("rul_lower")),"point":_clean(r.get("rul_point")),
-                "hi":_clean(r.get("health_index_smooth")),"slope":_clean(r.get("health_index_slope")),
-                "stability":r.get("decision_stability") if pd.notna(r.get("decision_stability")) else "n/a",
-                "evidence":_why(r),"windows":{str(int(h)):(r.get(horizon_key(h)) if pd.notna(r.get(horizon_key(h))) else "unknown") for h in DEFAULT_HORIZONS},
-                "baseline":r.get("baseline_source") if pd.notna(r.get("baseline_source")) else "unavailable",
-                "duty":r.get("duty") if pd.notna(r.get("duty")) else "not_assessed",
-                "peakHi":_clean(r.get("peak_index")),"offHi":_clean(r.get("offpeak_index")),
-                "loadT":_clean(r.get("load_sensitivity_t")),"sensitive":bool(r.get("load_sensitive")) if pd.notna(r.get("load_sensitive")) else False,
-                "contributions":{c.removeprefix("contribution_"):_clean(r[c]) for c in df if c.startswith("contribution_")}})
-        assets.append({"id":aid,"train":str(g.train_id.dropna().iloc[0]),"rows":rows})
-    return {"days":[pd.Timestamp(d).strftime("%Y-%m-%d") for d in days],"assets":assets,
+        assets.append({"id":aid,"train":str(g.train_id.dropna().iloc[0]),"rows":per_asset[aid]})
+    dstr=[pd.Timestamp(d).strftime("%Y-%m-%d") for d in days]
+    last=pd.Timestamp(days[-1])
+    threshold=_clean(df.threshold.dropna().iloc[0]) if "threshold" in df and df.threshold.notna().any() else None
+    return {"days":dstr,"assets":assets,
         "rec":RECOMMENDATION,"meaning":FRIENDLY_MEANING,"signalNames":SIGNAL_NAMES,
         "thresholds":{"withdraw":policy.withdraw_days,"tonight":policy.tonight_days,"plan":policy.plan_days},
+        "threshold":threshold,
+        "window":WINDOW,
+        # The daily aggregate for a telemetry day only lands the following midnight;
+        # the header says so rather than implying the page is live.
+        "replay":{"through":last.strftime("%Y-%m-%d"),
+                  "availableAt":(last+pd.Timedelta(days=1)).strftime("%Y-%m-%d 00:00 SGT")},
+        "verification":_verification(days),
+        "inspection":_inspection(days,DATA/"door_deferral.parquet",surfaced_assets(df),df),
         "duty":{"bands":str(df.duty_bands.dropna().iloc[0]) if "duty_bands" in df and df.duty_bands.notna().any() else "no peak identified",
-            "threshold":_clean(df.threshold.dropna().iloc[0]) if "threshold" in df and df.threshold.notna().any() else None},
+            "threshold":threshold},
         "scope":"Demonstration on simulated door data."}
 
-TEMPLATE = '<!doctype html>\n<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Headway — Fleet decisions</title>\n<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">\n<style>\n  /* ------------------------------------------------------------------ theme\n     Light is the default: this is read on a depot screen and in daylight as\n     often as at 01:00. Dark is kept because the product\'s working hours really\n     are 00:00-05:30, and the toggle costs one attribute.\n\n     The four aspects get FOUR distinct hues, not the two the real signalling\n     colours would give. On a real signal head, PLAN and TONIGHT are both\n     yellow and are told apart by the NUMBER of lamps lit. On a screen that\n     reads as "two ambers that look the same", which is exactly the wrong\n     ambiguity for the two most consequential states. So: distinct hue AND the\n     lamp count, belt and braces.\n  */\n  :root{\n    --ground:#F4F6F9; --panel:#FFFFFF; --panel2:#FAFBFC; --line:#DFE4EA;\n    --line-strong:#C4CCD6;\n    --text:#0E1621; --muted:#5A6675; --faint:#8A94A2;\n    /* Lamp colours are vivid (they are dots, they need to read at 9px);\n       text colours are darker so they clear 4.5:1 on white. Four separated\n       hues - gold, orange, red - because PLAN and TONIGHT are the two most\n       consequential states and must never be mistaken for each other. */\n    --green:#07794F; --green-lamp:#10B981; --green-bg:#E7F6F0;\n    --plan:#A16207;  --plan-lamp:#EAB308; --plan-bg:#FEF7E0;\n    --tonight:#C2410C; --tonight-lamp:#F97316; --tonight-bg:#FEEEE2;\n    --red:#B01212; --red-lamp:#EF4444; --red-bg:#FCEAEA;\n    --accent:#1D4ED8; --accent-bg:#EAF0FE;\n    --shadow:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.04);\n    /* Playfair Display throughout; IBM Plex Mono retained ONLY for figures,\n       because margins, sigma values and dates line up in columns and a\n       proportional serif breaks that alignment. */\n    --disp:\'Playfair Display\',Georgia,\'Times New Roman\',serif;\n    --body:\'Roboto\',\'Segoe UI\',\'Helvetica Neue\',Arial,sans-serif;\n    --mono:\'IBM Plex Mono\',Consolas,monospace;\n  }\n  :root[data-theme="dark"]{\n    --ground:#0A0F1A; --panel:#101726; --panel2:#0D1420; --line:#1E2A3D;\n    --line-strong:#2C3A50;\n    --text:#E6EDF7; --muted:#96A3B8; --faint:#5F6C80;\n    --green:#34D399; --green-lamp:#34D399; --green-bg:#0E2A20;\n    --plan:#FACC15;  --plan-lamp:#FACC15; --plan-bg:#2B2210;\n    --tonight:#FB923C; --tonight-lamp:#FB923C; --tonight-bg:#2E1B0F;\n    --red:#F87171; --red-lamp:#F87171; --red-bg:#2C1416;\n    --accent:#8FB6E8; --accent-bg:#132033;\n    --shadow:none;\n  }\n  *{box-sizing:border-box}\n  body{margin:0;background:var(--ground);color:var(--text);font-family:var(--body);\n       font-size:16px;font-weight:500;line-height:1.6;padding:0 22px 90px}\n  .wrap{max-width:1240px;margin:0 auto}\n\n  /* Two-pane shell: a persistent selector on the left, one view at a time on\n     the right. Splitting the views keeps each screen answering ONE question -\n     what must I do tonight / how is the fleet / what is this door doing -\n     rather than asking the reader to scroll past two answers to reach a third. */\n  .app{display:grid;grid-template-columns:222px 1fr;gap:28px;align-items:start}\n  .side{position:sticky;top:0;padding:22px 0 26px;display:flex;flex-direction:column;gap:20px}\n  nav{display:flex;flex-direction:column;gap:3px}\n  .nav-item{display:flex;justify-content:space-between;align-items:center;gap:10px;\n            background:transparent;border:1px solid transparent;border-radius:8px;\n            padding:10px 12px;cursor:pointer;width:100%;text-align:left;\n            font-family:var(--body);font-size:15px;font-weight:500;color:var(--muted)}\n  .nav-item:hover{background:var(--panel)}\n  .nav-item[aria-current="page"]{background:var(--panel);border-color:var(--line);\n            color:var(--text);font-weight:700;box-shadow:var(--shadow)}\n  .nav-item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n  .badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);\n         background:var(--panel2);border:1px solid var(--line);border-radius:999px;\n         padding:1px 8px;font-variant-numeric:tabular-nums}\n  .nav-item[aria-current="page"] .badge{border-color:var(--line-strong);color:var(--text)}\n  .badge.hot{color:var(--tonight);border-color:var(--tonight)}\n\n  .side .panelbox{background:var(--panel);border:1px solid var(--line);border-radius:9px;\n                  padding:13px 14px;box-shadow:var(--shadow)}\n  .side .datebig{font-family:var(--mono);font-size:16px;font-weight:600;\n                 font-variant-numeric:tabular-nums;display:block;margin-bottom:9px}\n  .side .row{display:flex;gap:7px;align-items:center;margin-top:9px}\n  .side input[type=range]{width:100%;accent-color:var(--tonight)}\n  main{padding-top:22px;min-height:70vh}\n  .view{display:none} .view.on{display:block}\n  @media(max-width:880px){\n    .app{grid-template-columns:1fr;gap:8px}\n    .side{position:static;padding-bottom:8px}\n    nav{flex-direction:row;flex-wrap:wrap}\n    .nav-item{width:auto}\n    main{padding-top:6px}\n  }\n\n  /* ---------------------------------------------------------------- header */\n  header{display:flex;flex-wrap:wrap;gap:18px;align-items:center;\n         justify-content:space-between;padding:22px 0 16px}\n  .brand{font-family:var(--disp);font-weight:700;font-size:25px;letter-spacing:.03em;\n         display:flex;align-items:baseline}\n  .brand .chev{color:var(--tonight);font-weight:500;font-size:.78em;margin:0 .05em}\n  /* In the 222px sidebar the tagline cannot sit beside the wordmark without\n     wrapping mid-phrase, so it takes its own line. Column direction would break\n     the WORDMARK across lines instead ("HEAD / <> / WAY"), so wrap plus a\n     full-width basis on the tagline is the right tool here. */\n  .brand{flex-wrap:wrap;align-items:baseline;row-gap:3px}\n  .brand small{flex:0 0 100%;font-family:var(--body);font-weight:500;font-size:10.5px;\n               color:var(--faint);margin-left:0;letter-spacing:.14em;\n               text-transform:uppercase;white-space:nowrap}\n  .tools{display:flex;gap:8px;align-items:center}\n  .btn{background:var(--panel);color:var(--text);border:1px solid var(--line);\n       font-family:var(--mono);font-size:12px;padding:6px 12px;cursor:pointer;\n       border-radius:6px;box-shadow:var(--shadow)}\n  .btn:hover{border-color:var(--line-strong)}\n  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n\n  /* Aspect glyph. SHAPE carries the severity as well as colour, so the four\n     states stay separable in greyscale, on a bad projector, or for a\n     colour-blind viewer:\n\n         ring  ->  half  ->  full  ->  octagon\n       monitor    plan     tonight    withdraw\n\n     The octagon is doing real work: it is the stop sign, and it means the one\n     state that takes a train out of service never has to be read twice. */\n  .ico.a0{color:var(--green-lamp)} .ico.a1{color:var(--plan-lamp)}\n  .ico.a2{color:var(--tonight-lamp)} .ico.a3{color:var(--red-lamp)}\n\n  /* ----------------------------------------------------------- filter chips */\n  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}\n  .chip{display:flex;align-items:center;gap:8px;background:var(--panel);\n        border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;\n        font-size:13px;box-shadow:var(--shadow)}\n  .chip .n{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}\n  .chip .t{color:var(--muted);font-size:12px;letter-spacing:.04em;text-transform:uppercase}\n  .chip:hover{border-color:var(--line-strong)}\n  .chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-bg)}\n  .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n  .chip.c0 .n{color:var(--green)} .chip.c1 .n{color:var(--plan)}\n  .chip.c2 .n{color:var(--tonight)} .chip.c3 .n{color:var(--red)}\n\n  /* ------------------------------------------------------------- date strip */\n  .scrub{display:flex;align-items:center;gap:14px;background:var(--panel);\n         border:1px solid var(--line);border-radius:8px;padding:12px 16px;\n         margin:14px 0 4px;box-shadow:var(--shadow)}\n  .scrub label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;\n               text-transform:uppercase;color:var(--faint);white-space:nowrap}\n  .scrub input[type=range]{flex:1;accent-color:var(--tonight);min-width:120px}\n  .scrub .date{font-family:var(--mono);font-size:15px;font-weight:600;\n               font-variant-numeric:tabular-nums;white-space:nowrap}\n\n  h2{font-family:var(--body);font-weight:700;font-size:18px;letter-spacing:.01em;\n     margin:32px 0 3px}\n  .sub{color:var(--muted);font-size:14.5px;margin:0 0 14px}\n\n  /* ------------------------------------------------------------------ cards */\n  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}\n  .acard{background:var(--panel);border:1px solid var(--line);border-radius:10px;\n         padding:0;overflow:hidden;box-shadow:var(--shadow)}\n  .acard.a1{border-color:var(--plan)} .acard.a2{border-color:var(--tonight)}\n  .acard.a3{border-color:var(--red)}\n  .acard .body{padding:15px 17px 16px}\n  .acard .top{display:flex;justify-content:space-between;align-items:center;gap:10px}\n  .acard .vwrap{display:flex;align-items:center;gap:10px}\n  .acard .verd{font-family:var(--body);font-weight:700;font-size:15px;letter-spacing:.05em}\n  .a1 .verd{color:var(--plan)} .a2 .verd{color:var(--tonight)} .a3 .verd{color:var(--red)}\n  .acard .aid{font-family:var(--mono);font-size:11.5px;color:var(--muted)}\n  .acard .mean{color:var(--text);font-size:14.5px;margin:8px 0 12px}\n  .acard.held{border-color:var(--line)}\n  .acard.held .verd{color:var(--muted)}\n  .chip-held{font-family:var(--mono);font-size:9px;letter-spacing:.12em;font-weight:600;\n             border:1px solid var(--line-strong);color:var(--muted);padding:2px 7px;\n             border-radius:999px;margin-left:2px}\n\n  /* margin is the hero number - it is the thing being decided on */\n  .nums{display:flex;gap:10px;margin-bottom:11px}\n  .nums .cell{flex:1;background:var(--panel2);border:1px solid var(--line);\n              border-radius:7px;padding:8px 10px}\n  .nums .cell.hero{flex:1.25}\n  .k{font-family:var(--mono);font-size:9px;letter-spacing:.13em;\n     text-transform:uppercase;color:var(--faint);display:block;margin-bottom:2px}\n  .v{font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;\n     line-height:1.2}\n  .v.sm{font-size:13px;font-weight:500}\n  .a1 .cell.hero .v{color:var(--plan)} .a2 .cell.hero .v{color:var(--tonight)}\n  .a3 .cell.hero .v{color:var(--red)}\n  .held .cell.hero .v{color:var(--muted)}\n  /* the deferral ledger: a priced menu, not a verdict */\n  .ledger{margin:2px 0 12px;border:1px solid var(--line);border-radius:7px;\n          background:var(--panel2);overflow:hidden}\n  .ledger .lhd{font-family:var(--mono);font-size:9px;letter-spacing:.13em;\n               text-transform:uppercase;color:var(--faint);padding:8px 11px 6px}\n  .ledger .lrow{display:flex;justify-content:space-between;align-items:baseline;\n                gap:10px;padding:4px 11px;font-size:13px}\n  .ledger .lrow:last-child{padding-bottom:9px}\n  .ledger .lrow .w{color:var(--muted)}\n  .ledger .lrow .p{font-family:var(--mono);font-weight:600;\n                   font-variant-numeric:tabular-nums}\n  .ledger .lrow.ok .p{color:var(--green)}\n  .ledger .lrow.warn .p{color:var(--plan)}\n  .ledger .lrow.hot .p{color:var(--red)}\n  .ledger .lrow.unk .p{color:var(--faint)}\n  .ledger .safe{border-top:1px solid var(--line);padding:7px 11px;font-size:12.5px;\n                color:var(--text);background:var(--panel)}\n  .ledger .safe b{font-family:var(--mono);font-variant-numeric:tabular-nums}\n\n  /* fit-for-duty: a flag and its figures, no prose. */\n  .duty{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 9px;margin:0 0 12px;\n        padding:8px 11px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}\n  .duty .dk{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}\n  .duty .dv{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em}\n  .duty .db,.duty .ds{flex:0 0 100%;font-family:var(--mono);font-variant-numeric:tabular-nums}\n  .duty .db{font-size:11px;color:var(--muted)}\n  .duty .ds{font-size:10.5px;color:var(--faint)}\n  .duty.d-off_peak_only{border-color:var(--tonight);background:var(--tonight-bg)}\n  .duty.d-off_peak_only .dv{color:var(--tonight)}\n  .duty.d-withdraw{border-color:var(--red);background:var(--red-bg)}\n  .duty.d-withdraw .dv{color:var(--red)}\n  .duty.d-full_service{background:transparent}\n  .duty.d-full_service .dv,.duty.d-not_assessed .dv{color:var(--faint);font-weight:500}\n  .tile .dm{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;\n            color:var(--tonight);display:block;line-height:1.2}\n  .chip.cd .n{color:var(--tonight)}\n  .acard ul{margin:0;padding-left:17px}\n  .acard li{font-size:13.5px;color:var(--muted);margin-bottom:4px}\n  .acard li b{color:var(--text)}\n  .empty{color:var(--muted);font-size:14.5px;background:var(--panel);\n         border:1px dashed var(--line-strong);border-radius:10px;padding:26px;\n         text-align:center;grid-column:1/-1}\n\n  /* ------------------------------------------------------------------ fleet */\n  .fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}\n  .tile{display:flex;align-items:center;gap:8px;background:var(--panel);\n        border:1px solid var(--line);border-radius:8px;padding:8px 9px;cursor:pointer;\n        text-align:left;box-shadow:var(--shadow);transition:border-color .12s,transform .12s}\n  .tile:hover{border-color:var(--line-strong);transform:translateY(-1px)}\n  .tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n  .tile.sel{border-color:var(--accent);background:var(--accent-bg)}\n  .tile .meta{min-width:0}\n  .tile .lab{font-family:var(--mono);font-size:10.5px;color:var(--muted);\n             white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}\n  .tile .mrg{font-family:var(--mono);font-size:12px;font-weight:600;\n             font-variant-numeric:tabular-nums;display:block;line-height:1.25}\n  .tile.a0 .mrg{color:var(--faint);font-weight:400}\n  .tile.a1{background:var(--plan-bg);border-color:var(--plan)}\n  .tile.a1 .mrg{color:var(--plan)}\n  .tile.a2{background:var(--tonight-bg);border-color:var(--tonight)}\n  .tile.a2 .mrg{color:var(--tonight)}\n  .tile.a3{background:var(--red-bg);border-color:var(--red)}\n  .tile.a3 .mrg{color:var(--red)}\n\n  /* ----------------------------------------------------------------- detail */\n  .detail{background:var(--panel);border:1px solid var(--line);border-radius:10px;\n          padding:18px 20px;margin-top:16px;box-shadow:var(--shadow)}\n  .detail h3{font-family:var(--body);font-weight:700;font-size:17px;margin:0 0 3px}\n  .detail .note{color:var(--muted);font-size:13px;margin:0 0 14px}\n  .detail .split{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}\n  @media(min-width:1180px){\n    .detail .split{grid-template-columns:minmax(0,1.5fr) minmax(330px,1fr)}\n  }\n  .chart svg{display:block;width:100%;height:auto;overflow:visible}\n  svg.ico{flex:none;display:inline-block;vertical-align:middle}\n  .axis{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 14px;\n        font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:6px}\n  .axis .mid{flex:1;text-align:center;min-width:150px}\n\n.a-1 .verd,.ico.a-1{color:var(--muted)}\n.tile.a-1{border-style:dashed;background:var(--panel2)}\nh2{margin-top:0}.hint{font-size:12px;color:var(--muted)}\n.scope{font-size:12px;color:var(--muted);border-left:3px solid var(--accent);padding:8px 12px;margin-bottom:18px}\n.state{display:inline-block;padding:2px 8px;background:var(--accent-bg);border-radius:5px;font-size:12px}\n.cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}\n.ledger .lrow{font-size:12px;align-items:center}.ledger .lrow .p{font-size:11px;text-align:right}\n.chart-gap{color:var(--muted)}\n  .cardlink{display:block;cursor:pointer;border-radius:10px}\n  .cardlink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n  .cardlink .acard{transition:border-color .12s,transform .12s;height:100%}\n  .cardlink:hover .acard{border-color:var(--line-strong);transform:translateY(-1px)}\n  .back{margin:0 0 14px;font-family:var(--body);font-size:13px}\n  .daynav{display:flex;align-items:center;gap:10px;margin:6px 0 18px;flex-wrap:wrap}\n  .daynav #dwhen{font-family:var(--mono);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;min-width:96px;text-align:center}\n  .daynav .hint{margin-left:auto}\n  .chart{margin:2px 0 0}\n  .chart svg{cursor:ew-resize;touch-action:none;max-height:250px}\n  .drv{list-style:none;padding:0;margin:6px 0 0}\n  .drv li{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:4px 0;border-bottom:1px solid var(--line);color:var(--muted)}\n  .drv li:last-child{border-bottom:0}\n  .drv li b{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--text)}\n  .scrub{margin:0 0 14px}\n  .pjob{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}\n  .pjob.out{opacity:.5;background:var(--panel2)}\n  .pjob .pnum{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);min-width:18px;text-align:center}\n  .pjob .pmeta{flex:1;min-width:0;cursor:pointer}\n  .pjob .pmeta b{display:block;font-family:var(--mono);font-size:13px}\n  .pjob .pmeta span{color:var(--muted);font-size:12px}\n  .pjob .pact{display:flex;gap:4px;flex-shrink:0}\n  .pjob .pact .btn{padding:4px 9px}\n  .pjob .pact .btn[disabled]{opacity:.35;cursor:default}\n  .rvnote{font-size:12.5px;color:var(--tonight);font-weight:600;margin:0 0 6px}\n  .psec{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);margin:18px 0 7px}\n  .psec:first-child{margin-top:2px}\n  .pjob .pmeta{display:flex;flex-direction:column;gap:2px}\n  .ptag{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tonight)}\n  .pnote{font-size:12px}\n  .pnote.ok{color:var(--muted)} .pnote.bad{color:var(--red)} .pnote.unk{color:var(--faint)}\n  .ptag.held{color:var(--muted);text-transform:none;letter-spacing:.02em;font-size:11px}\n  .pjob.done{opacity:.6}\n  .pjob.done .pnum{color:var(--green)}\n  .btn.prim{border-color:var(--accent);color:var(--accent);font-weight:600}\n  .btn.plnd{color:var(--green);border-color:var(--green)}\n  .cardact{display:flex;justify-content:flex-end;margin:8px 0 2px}\n</style></head><body><div class="wrap"><div class="app">\n<aside class="side">\n<div class="brand">HEAD<span class="chev">&lsaquo;&rsaquo;</span>WAY<small>Time to act</small></div>\n<nav id="nav" aria-label="Views">\n<button class="nav-item" data-view="status">Status <span class="badge" id="b-status"></span></button>\n<button class="nav-item" data-view="review">Review <span class="badge" id="b-review"></span></button>\n<button class="nav-item" data-view="planner">Planner <span class="badge" id="b-planner"></span></button>\n<button class="nav-item" data-view="fleet">Fleet <span class="badge" id="b-fleet"></span></button>\n</nav>\n<button class="btn" id="theme">Dark theme</button>\n<div class="hint">Demo · simulated door data</div>\n</aside><main>\n<section id="v-status" class="view"><h2>Status</h2><p class="sub" id="status-sub"></p><div class="cards" id="status-cards"></div></section>\n<section id="v-review" class="view"><h2>Review</h2><p class="sub" id="review-sub"></p><div class="cards" id="review-cards"></div></section>\n<section id="v-planner" class="view"><h2>Planner</h2><div class="daynav"><button class="btn" id="pl-prev" aria-label="Earlier night">&lsaquo;</button><span id="pl-when"></span><button class="btn" id="pl-next" aria-label="Later night">&rsaquo;</button><button class="btn" id="pl-reset">Reset</button></div><p class="sub" id="plan-sub"></p><div id="plan-list"></div></section>\n<section id="v-fleet" class="view"><h2>Fleet</h2><div class="scrub"><label for="fday">Date</label><input id="fday" type="range" min="0" step="1" aria-label="Replay date"><span class="date" id="fdate"></span></div><div class="filters" id="filters"></div><div class="fleet" id="fleet"></div></section>\n<section id="v-asset" class="view"><button class="btn back" id="back" hidden>&larr; Back</button><h2>Door detail</h2><div id="detail" class="detail"></div></section>\n</main></div></div>\n<script type="application/json" id="payload">__PAYLOAD__</script>\n<script>\nconst DATA=JSON.parse(document.getElementById(\'payload\').textContent),N=DATA.days.length;\nlet day=N-1,selected=null,filter=\'all\',view=\'status\',prevView=\'status\',dragging=false;\nconst el=id=>document.getElementById(id);\nconst esc=v=>String(v??\'\').replace(/[&<>"\']/g,c=>({\'&\':\'&amp;\',\'<\':\'&lt;\',\'>\':\'&gt;\',\'"\':\'&quot;\',"\'":\'&#39;\'}[c]));\nconst fmt=v=>Number.isFinite(v)?v.toFixed(1)+\' d\':\'\\u2014\';\nconst CW=920,CH=230,ML=40,MR=16,MT=12,MB=24;\nconst cx=i=>ML+i*(CW-ML-MR)/Math.max(N-1,1);\nconst states={valid:\'\',insufficient_history:\'Not enough history yet\',insufficient_data:\'Missing or incomplete data\',no_worsening_trend:\'Not getting worse right now\',elevated_no_trend:\'High, but not trending\',threshold_exceeded:\'At or past the learned threshold\',uncalibrated:\'Not enough data to calibrate\',outside_horizon:\'More than 90 days out\',outside_training_conditions:\'Unusual conditions\',stale_data:\'Data is out of date\',missing_observation:\'No reading for this day\',not_yet_available:\'Not available yet\'};\nconst label=s=>s in states?states[s]:String(s).replaceAll(\'_\',\' \');\nconst held=r=>r.aspect>0&&r.aspect>r.raw;\nfunction head(a){\n const shape=a===-1?\'<text x="7" y="11" text-anchor="middle" fill="currentColor" font-size="12">?</text>\':a===3?\'<polygon points="4,1 10,1 13,4 13,10 10,13 4,13 1,10 1,4" fill="currentColor"/>\':a===2?\'<circle cx="7" cy="7" r="6" fill="currentColor"/>\':a===1?\'<path d="M7 1 A6 6 0 0 1 7 13 Z" fill="currentColor"/><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor"/>\':\'<circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="2"/>\';\n return \'<svg class="ico a\'+a+\'" width="16" height="16" viewBox="0 0 14 14" aria-hidden="true">\'+shape+\'</svg>\';\n}\nconst windowText={within_margin:[\'OK\',\'ok\'],exceeds_margin:[\'Too long\',\'hot\'],no_positive_margin:[\'No positive margin\',\'warn\'],threshold_exceeded:[\'Learned threshold reached\',\'hot\'],unknown:[\'Can\\u2019t tell\',\'unk\']};\nfunction ledger(r){\n const rows=[0,3,7,14,28].map(h=>{const w=windowText[r.windows[String(h)]]||windowText.unknown;return \'<div class="lrow \'+w[1]+\'"><span class="w">\'+(h===0?\'Now\':\'+\'+h+\' days\')+\'</span><span class="p">\'+w[0]+\'</span></div>\';}).join(\'\');\n return \'<div class="ledger"><div class="lhd">Can the fix wait?</div>\'+rows+\'</div>\';\n}\nfunction duty(r){\n const d=DATA.duty;\n const v={off_peak_only:\'OFF-PEAK ONLY\',withdraw:\'WITHDRAW\',full_service:\'no peak restriction\',not_assessed:\'not assessed\'}[r.duty]||esc(r.duty);\n let out=\'<div class="duty d-\'+esc(r.duty)+\'"><span class="dk">Fit for duty</span><span class="dv">\'+v+\'</span>\';\n if(r.duty===\'off_peak_only\'){\n  out+=\'<span class="db">avoid \'+esc(d.bands)+\'</span>\';\n  const p=[];\n  if(Number.isFinite(r.peakHi))p.push(\'at peak \'+r.peakHi.toFixed(0));\n  if(Number.isFinite(r.hi))p.push(\'typical \'+r.hi.toFixed(0));\n  if(Number.isFinite(r.offHi))p.push(\'off-peak \'+r.offHi.toFixed(0));\n  if(Number.isFinite(d.threshold))p.push(\'fault at \'+d.threshold.toFixed(0));\n  if(p.length)out+=\'<span class="ds">wear: \'+esc(p.join(\' \\u00b7 \'))+\'</span>\';\n }\n return out+\'</div>\';\n}\nfunction card(a,di){\n const r=a.rows[di],h=held(r);\n const st=label(r.state)?\'<p class="state">\'+esc(label(r.state))+\'</p>\':\'\';\n const safe=Number.isFinite(r.margin)?(r.margin<=0?\'no positive margin\':r.margin<1?\'under 1 day\':\'\\u2265 \'+(Math.floor(r.margin*10)/10).toFixed(1)+\' days\'):\'\\u2014\';\n const wear=Number.isFinite(r.hi)?r.hi.toFixed(0):\'\\u2014\';\n const fault=Number.isFinite(DATA.duty.threshold)?DATA.duty.threshold.toFixed(0):\'\\u2014\';\n const bul=(h?[\'Kept from an earlier alert; missing data cannot clear it.\']:[]).concat(r.evidence||[]);\n return \'<div class="acard a\'+r.aspect+\'"><div class="body">\'\n  +\'<div class="top"><span class="vwrap">\'+head(r.aspect)+\'<span class="verd">\'+esc(DATA.rec[r.aspect])+\'</span>\'+(h?\'<span class="chip-held">HELD</span>\':\'\')+\'</span><span class="aid">\'+esc(a.id)+\'</span></div>\'\n  +\'<p class="mean">\'+esc(DATA.meaning[r.aspect])+\'</p>\'+st\n  +\'<div class="nums"><div class="cell hero"><span class="k">Estimated lower margin</span><span class="v">\'+safe+\'</span></div><div class="cell"><span class="k">Wear now</span><span class="v sm">\'+wear+\'</span></div><div class="cell"><span class="k">Fault at</span><span class="v sm">\'+fault+\'</span></div></div>\'\n  +duty(r)+ledger(r)\n  +(bul.length?\'<ul>\'+bul.map(e=>\'<li>\'+esc(e)+\'</li>\').join(\'\')+\'</ul>\':\'\')\n  +\'</div></div>\';\n}\nconst RVWIN=21;\nfunction statusRows(){return DATA.assets.filter(a=>{const r=a.rows[N-1];return r.aspect>=2||r.aspect===-1||r.duty===\'off_peak_only\';});}\nfunction recentPeak(a){let b={aspect:-9,i:-1};for(let i=Math.max(0,N-RVWIN);i<N;i++){const x=a.rows[i];if(x.aspect>b.aspect)b={aspect:x.aspect,i:i};}return b;}\nfunction reviewRows(){\n const sids=new Set(statusRows().map(a=>a.id));\n return DATA.assets.filter(a=>{\n  if(sids.has(a.id))return false;\n  const r=a.rows[N-1];\n  if(r.aspect===1||held(r))return true;\n  for(let i=Math.max(0,N-RVWIN);i<N;i++){const x=a.rows[i];if(x.aspect>=2||x.duty===\'off_peak_only\')return true;}\n  return false;\n });\n}\nfunction list(rows,di){\n const j=loadJobs();\n return rows.map(a=>{\n  const s=j[a.id]&&j[a.id].state;\n  const act=s===\'planned\'?\'<button class="btn plnd" data-job="goto:\'+esc(a.id)+\'">In the plan \\u2713</button>\'\n   :s===\'done\'?\'<button class="btn plnd" data-job="goto:\'+esc(a.id)+\'">Completed \\u2713</button>\'\n   :\'<button class="btn prim" data-job="add:\'+esc(a.id)+\'">Add to plan</button>\';\n  return \'<div class="cardlink" data-open="\'+esc(a.id)+\'" role="button" tabindex="0">\'+card(a,di)+\'<div class="cardact">\'+act+\'</div></div>\';\n }).join(\'\');\n}\nfunction renderStatus(){\n const rows=statusRows().sort((x,y)=>y.rows[N-1].aspect-x.rows[N-1].aspect);\n const restr=rows.filter(a=>a.rows[N-1].duty===\'off_peak_only\').length;\n el(\'status-sub\').textContent=rows.length?((rows.length===1?\'1 door needs\':rows.length+\' doors need\')+\' action now\')+(restr?\', \'+restr+\' off-peak only until fixed.\':\'.\'):\'Nothing needs action right now.\';\n el(\'status-cards\').innerHTML=rows.length?list(rows,N-1):\'<div class="empty">Nothing needs action right now.</div>\';\n}\nfunction renderReview(){\n const rows=reviewRows().sort((x,y)=>y.rows[N-1].aspect-x.rows[N-1].aspect||recentPeak(y).aspect-recentPeak(x).aspect);\n el(\'review-sub\').textContent=rows.length?((rows.length===1?\'1 door\':rows.length+\' doors\')+\' flagged in the last \'+RVWIN+\' days.\'):\'Nothing flagged recently.\';\n el(\'review-cards\').innerHTML=rows.length?rows.map(a=>{\n  const cur=a.rows[N-1],pk=recentPeak(a);\n  const note=cur.aspect===1?\'Plan a maintenance slot.\':pk.aspect>=2?\'Reached \'+esc(DATA.rec[pk.aspect])+\' on \'+DATA.days[pk.i]+\' — confirm the repair held.\':\'Flagged recently — review.\';\n  return \'<div class="cardlink" data-open="\'+esc(a.id)+\'" role="button" tabindex="0"><p class="rvnote">\'+note+\'</p>\'+card(a,N-1)+\'</div>\';\n }).join(\'\'):\'<div class="empty">Nothing flagged recently.</div>\';\n}\nfunction counts(){const c={\'-1\':0,0:0,1:0,2:0,3:0};for(const a of DATA.assets)c[a.rows[day].aspect]++;return c;}\nfunction renderFleet(){\n el(\'fday\').max=N-1;el(\'fday\').value=day;el(\'fdate\').textContent=DATA.days[day];\n const c=counts();\n const items=[[\'all\',\'All\',DATA.assets.length],[3,\'Withdraw\',c[3]],[2,\'Tonight\',c[2]],[1,\'Plan\',c[1]],[0,\'Monitor\',c[0]],[-1,\'Check data\',c[-1]],[\'duty\',\'Off-peak only\',DATA.assets.filter(a=>a.rows[day].duty===\'off_peak_only\').length]];\n el(\'filters\').innerHTML=items.map(it=>\'<button class="chip\'+(it[0]===\'duty\'?\' cd\':\'\')+\'" data-f="\'+it[0]+\'" aria-pressed="\'+(String(filter)===String(it[0]))+\'"><span class="n">\'+it[2]+\'</span><span class="t">\'+esc(it[1])+\'</span></button>\').join(\'\');\n el(\'fleet\').innerHTML=DATA.assets.filter(a=>filter===\'all\'||(filter===\'duty\'?a.rows[day].duty===\'off_peak_only\':a.rows[day].aspect===Number(filter))).map(a=>{\n  const r=a.rows[day];\n  return \'<button class="tile a\'+r.aspect+\'" data-open="\'+esc(a.id)+\'" aria-label="\'+esc(a.id+\', \'+DATA.rec[r.aspect])+\'">\'+head(r.aspect)+\'<span class="meta"><span class="mrg">\'+(r.aspect===-1?\'Check data\':r.aspect===0?\'OK\':fmt(r.margin))+\'</span><span class="lab">\'+esc(a.id)+\'</span>\'+(r.duty===\'off_peak_only\'?\'<span class="dm">off-peak only</span>\':\'\')+\'</span></button>\';\n }).join(\'\');\n}\nfunction chartBlock(a){\n const vals=a.rows.map(r=>r.hi),finite=vals.filter(Number.isFinite);\n const nav=\'<div class="daynav"><button class="btn" id="dprev" aria-label="Previous day">\\u2039</button><span id="dwhen">\'+DATA.days[day]+\'</span><button class="btn" id="dnext" aria-label="Next day">\\u203a</button><span class="hint">drag the chart to change date</span></div>\';\n if(!finite.length)return \'<p class="sub">No wear readings for this door.</p>\'+nav;\n const lo=Math.min(0,...finite),fl=Number.isFinite(DATA.duty.threshold)?DATA.duty.threshold:0,hi=Math.max(6,fl*1.06,...finite);\n const cy=v=>CH-MB-(v-lo)*(CH-MT-MB)/(hi-lo);\n let path=\'\',pen=false;\n vals.forEach((v,i)=>{if(!Number.isFinite(v)){pen=false;return;}path+=(pen?\'L\':\'M\')+cx(i).toFixed(1)+\' \'+cy(v).toFixed(1)+\' \';pen=true;});\n const flL=fl?\'<line x1="\'+cx(0)+\'" x2="\'+cx(N-1)+\'" y1="\'+cy(fl).toFixed(1)+\'" y2="\'+cy(fl).toFixed(1)+\'" stroke="var(--red)" stroke-dasharray="4 4" opacity=".6"/><text x="\'+(cx(N-1)-2)+\'" y="\'+(cy(fl)-4).toFixed(1)+\'" text-anchor="end" fill="var(--red)" font-size="10">fault level</text>\':\'\';\n const mk=cx(day).toFixed(1);\n return \'<div class="chart"><svg id="dchart" viewBox="0 0 \'+CW+\' \'+CH+\'" preserveAspectRatio="none" role="img" aria-label="Wear level over time; drag to change date">\'\n  +flL+\'<path d="\'+path+\'" fill="none" stroke="var(--accent)" stroke-width="2"/>\'\n  +\'<line id="dmark" x1="\'+mk+\'" x2="\'+mk+\'" y1="\'+MT+\'" y2="\'+(CH-MB)+\'" stroke="var(--text)" stroke-width="1.5"/></svg></div>\'+nav;\n}\nfunction extra(a){\n const r=a.rows[day];\n const cs=Object.entries(r.contributions).filter(kv=>Number.isFinite(kv[1])).sort((x,y)=>Math.abs(y[1])-Math.abs(x[1]));\n const base=r.baseline===\'asset_reference\'?\'Compared against this door\\u2019s own early history.\':r.baseline===\'fleet_fallback\'?\'Compared against the fleet average (own history too short).\':\'\';\n const drv=cs.length?\'<p class="k" style="margin-top:16px">What is pushing the wear reading</p><ul class="drv">\'+cs.map(kv=>{const n=DATA.signalNames[kv[0].replace(/_hx$/,\'\')]||kv[0].replace(/_hx$/,\'\').replaceAll(\'_\',\' \');return \'<li><span>\'+esc(n)+\'</span><b>\'+(kv[1]>0?\'+\':\'\')+kv[1].toFixed(1)+\'</b></li>\';}).join(\'\')+\'</ul>\':\'\';\n return (base?\'<p class="hint">\'+base+\'</p>\':\'\')+drv;\n}\nfunction renderDetail(){\n const a=DATA.assets.find(x=>x.id===selected);\n if(!a){el(\'detail\').innerHTML=\'<p class="sub">Pick a door from Status, Review or Fleet.</p>\';return;}\n el(\'detail\').innerHTML=\'<h3>\'+esc(a.id)+\'</h3>\'+chartBlock(a)+\'<div id="dbody"></div>\';\n el(\'dbody\').innerHTML=card(a,day)+extra(a);\n wireChart(a);\n}\nfunction updateDay(a){\n day=Math.max(0,Math.min(N-1,day));\n const m=el(\'dmark\');if(m){const gx=cx(day).toFixed(1);m.setAttribute(\'x1\',gx);m.setAttribute(\'x2\',gx);}\n const w=el(\'dwhen\');if(w)w.textContent=DATA.days[day];\n el(\'dbody\').innerHTML=card(a,day)+extra(a);\n}\nfunction seek(a,ev){\n const svg=el(\'dchart\');if(!svg)return;\n const r=svg.getBoundingClientRect();\n const xCW=(ev.clientX-r.left)/r.width*CW;\n const step=(CW-ML-MR)/Math.max(N-1,1);\n const i=Math.max(0,Math.min(N-1,Math.round((xCW-ML)/step)));\n if(i!==day){day=i;updateDay(a);}\n}\nfunction wireChart(a){\n const svg=el(\'dchart\');\n if(svg){\n  svg.addEventListener(\'pointerdown\',e=>{dragging=true;try{svg.setPointerCapture(e.pointerId);}catch(_){}seek(a,e);});\n  svg.addEventListener(\'pointermove\',e=>{if(dragging)seek(a,e);});\n  svg.addEventListener(\'pointerup\',()=>{dragging=false;});\n  svg.addEventListener(\'pointercancel\',()=>{dragging=false;});\n }\n const p=el(\'dprev\'),n=el(\'dnext\');\n if(p)p.onclick=()=>{if(day>0){day--;updateDay(a);}};\n if(n)n.onclick=()=>{if(day<N-1){day++;updateDay(a);}};\n}\nlet planDate=N-1;\n// A job is the operator\'s record, not the model\'s: it survives the model\n// changing its mind, and it is what carries over when a window runs out.\n// open (flagged, uncommitted) -> planned (committed to a night) -> done.\nconst JOBKEY=\'headway.jobs\';\nconst dayIdx=d=>DATA.days.indexOf(d);\nfunction loadJobs(){try{return JSON.parse(localStorage.getItem(JOBKEY)||\'{}\')||{};}catch(e){return {};}}\nfunction saveJobs(j){try{localStorage.setItem(JOBKEY,JSON.stringify(j));}catch(e){}}\nfunction flagged(di){return DATA.assets.filter(a=>{const r=a.rows[di];return r.aspect>=1||r.duty===\'off_peak_only\'||held(r);});}\n// Planned jobs roll forward on their own: anything committed to this night or an\n// earlier one that was never marked done is still outstanding tonight.\nfunction planned(di){const j=loadJobs();return Object.keys(j).filter(id=>j[id].state===\'planned\'&&dayIdx(j[id].window)<=di).sort((x,y)=>(j[x].order||0)-(j[y].order||0));}\nfunction completed(di){const j=loadJobs();return Object.keys(j).filter(id=>j[id].state===\'done\'&&dayIdx(j[id].doneOn)===di);}\nfunction addJob(id,di){const j=loadJobs(),o=Object.keys(j).map(k=>j[k].order||0);j[id]={window:DATA.days[di],state:\'planned\',order:(o.length?Math.max.apply(null,o):-1)+1};saveJobs(j);}\nfunction markDone(id,di){const j=loadJobs();if(j[id]){j[id].state=\'done\';j[id].doneOn=DATA.days[di];saveJobs(j);}}\nfunction reopenJob(id,di){const j=loadJobs();if(j[id]){j[id].state=\'planned\';j[id].window=DATA.days[di];delete j[id].doneOn;saveJobs(j);}}\nfunction removeJob(id){const j=loadJobs();delete j[id];saveJobs(j);}\nfunction planMove(id,d){\n const j=loadJobs(),p=planned(planDate),i=p.indexOf(id),k=i+d;\n if(i<0||k<0||k>=p.length)return;\n const oi=j[p[i]].order||0;j[p[i]].order=j[p[k]].order||0;j[p[k]].order=oi;saveJobs(j);renderPlanner();\n}\nfunction tonightOpen(){return planned(N-1).length;}\n// Same rounding rule as the card: never show more margin than the bound gives.\nfunction marginLabel(r){return Number.isFinite(r.margin)?(r.margin<=0?\'no positive margin\':r.margin<1?\'under 1 day\':\'\\u2265 \'+(Math.floor(r.margin*10)/10).toFixed(1)+\' d\'):\'no countdown\';}\n// The cost of a rollover, read off the same lower bound the card shows.\nfunction carryNote(r){\n if(!Number.isFinite(r.margin))return [\'unk\',\'No countdown available for this door.\'];\n if(r.margin<1)return [\'bad\',\'No positive margin left \\u2014 another night is outside the estimated lower margin.\'];\n return [\'ok\',\'Another night is still inside the estimated lower margin.\'];\n}\nfunction jobRow(id,i,n){\n const j=loadJobs()[id],a=DATA.assets.find(x=>x.id===id),r=a.rows[planDate];\n const wi=dayIdx(j.window),late=planDate-wi;\n let notes=\'\';\n if(late>0){\n  const c=carryNote(r);\n  notes+=\'<span class="ptag">carried from \'+DATA.days[wi]+\' \\u00b7 \'+late+(late>1?\' nights\':\' night\')+\' late</span>\';\n  notes+=\'<span class="pnote \'+c[0]+\'">\'+c[1]+\'</span>\';\n }\n if(held(r))notes+=\'<span class="ptag held">held from an earlier escalation; evidence today: \'+esc(DATA.rec[r.raw])+\'</span>\';\n else if(r.aspect===0)notes+=\'<span class="pnote ok">The model no longer flags this door \\u2014 close it, or keep it for inspection.</span>\';\n return \'<div class="pjob"><span class="pnum">\'+(i+1)+\'</span>\'+head(r.aspect)\n  +\'<span class="pmeta" data-open="\'+esc(id)+\'"><b>\'+esc(id)+\'</b><span>\'+esc(DATA.rec[r.aspect])+\' \\u00b7 \'+marginLabel(r)+(r.duty===\'off_peak_only\'?\' \\u00b7 off-peak only\':\'\')+\'</span>\'+notes+\'</span>\'\n  +\'<span class="pact"><button class="btn" data-pmv="up:\'+esc(id)+\'"\'+(i===0?\' disabled\':\'\')+\' aria-label="Higher priority">\\u2191</button>\'\n  +\'<button class="btn" data-pmv="dn:\'+esc(id)+\'"\'+(i===n-1?\' disabled\':\'\')+\' aria-label="Lower priority">\\u2193</button>\'\n  +\'<button class="btn prim" data-job="done:\'+esc(id)+\'">Done</button>\'\n  +\'<button class="btn" data-job="rm:\'+esc(id)+\'" aria-label="Remove from plan">\\u00d7</button></span></div>\';\n}\nfunction doneRow(id){\n const r=DATA.assets.find(x=>x.id===id).rows[planDate];\n return \'<div class="pjob done"><span class="pnum">\\u2713</span>\'+head(r.aspect)\n  +\'<span class="pmeta" data-open="\'+esc(id)+\'"><b>\'+esc(id)+\'</b><span>completed this night</span></span>\'\n  +\'<span class="pact"><button class="btn" data-job="undo:\'+esc(id)+\'">Undo</button></span></div>\';\n}\nfunction openRow(id){\n const r=DATA.assets.find(x=>x.id===id).rows[planDate];\n const tag=held(r)?\'<span class="ptag held">held from an earlier escalation</span>\':\'\';\n return \'<div class="pjob out"><span class="pnum">\\u25cb</span>\'+head(r.aspect)\n  +\'<span class="pmeta" data-open="\'+esc(id)+\'"><b>\'+esc(id)+\'</b><span>\'+esc(DATA.rec[r.aspect])+\' \\u00b7 \'+marginLabel(r)+\'</span>\'+tag+\'</span>\'\n  +\'<span class="pact"><button class="btn" data-job="add:\'+esc(id)+\'">Add to plan</button></span></div>\';\n}\nfunction renderPlanner(){\n el(\'pl-when\').textContent=DATA.days[planDate];\n const j=loadJobs(),plan=planned(planDate),done=completed(planDate);\n const open=flagged(planDate).filter(a=>!(a.id in j)).sort((x,y)=>y.rows[planDate].aspect-x.rows[planDate].aspect).map(a=>a.id);\n const carried=plan.filter(id=>dayIdx(j[id].window)<planDate).length;\n const bits=[];\n if(plan.length)bits.push(plan.length+(plan.length>1?\' jobs\':\' job\')+\' in this window\');\n if(carried)bits.push(carried+\' carried over\');\n if(done.length)bits.push(done.length+\' completed\');\n el(\'plan-sub\').textContent=bits.length?bits.join(\' \\u00b7 \')+\'.\':\'Nothing planned for this night.\';\n let h=\'\';\n h+=plan.length?\'<div class="psec">In this window</div>\'+plan.map((id,i)=>jobRow(id,i,plan.length)).join(\'\')\n   :\'<div class="empty">Nothing planned for this night. Add a flagged door below, or from Status.</div>\';\n if(done.length)h+=\'<div class="psec">Completed this night</div>\'+done.map(doneRow).join(\'\');\n if(open.length)h+=\'<div class="psec">Flagged, not planned \\u2014 \'+open.length+\'</div>\'+open.map(openRow).join(\'\');\n el(\'plan-list\').innerHTML=h;\n}\nfunction render(){\n el(\'b-status\').textContent=statusRows().length;\n el(\'b-review\').textContent=reviewRows().length;\n el(\'b-planner\').textContent=tonightOpen();\n el(\'b-fleet\').textContent=DATA.assets.length;\n for(const v of [\'status\',\'review\',\'planner\',\'fleet\',\'asset\'])el(\'v-\'+v).classList.toggle(\'on\',v===view);\n document.querySelectorAll(\'[data-view]\').forEach(b=>b.setAttribute(\'aria-current\',b.dataset.view===view?\'page\':\'false\'));\n el(\'back\').hidden=view!==\'asset\';\n if(view===\'status\')renderStatus();\n else if(view===\'review\')renderReview();\n else if(view===\'planner\')renderPlanner();\n else if(view===\'fleet\')renderFleet();\n else renderDetail();\n}\nel(\'fday\').addEventListener(\'input\',e=>{day=+e.target.value;render();});\ndocument.addEventListener(\'click\',e=>{\n const mv=e.target.closest(\'[data-pmv]\');if(mv){const a=mv.dataset.pmv.split(\':\');planMove(a[1],a[0]===\'up\'?-1:1);return;}\n const jb=e.target.closest(\'[data-job]\');\n if(jb){const s=jb.dataset.job,k=s.indexOf(\':\'),verb=s.slice(0,k),id=s.slice(k+1);\n  if(verb===\'add\')addJob(id,view===\'planner\'?planDate:N-1);\n  else if(verb===\'done\')markDone(id,planDate);\n  else if(verb===\'undo\')reopenJob(id,planDate);\n  else if(verb===\'rm\')removeJob(id);\n  else if(verb===\'goto\'){view=\'planner\';planDate=N-1;}\n  render();return;}\n if(e.target.id===\'pl-prev\'){planDate=Math.max(0,planDate-1);renderPlanner();return;}\n if(e.target.id===\'pl-next\'){planDate=Math.min(N-1,planDate+1);renderPlanner();return;}\n if(e.target.id===\'pl-reset\'){try{localStorage.removeItem(JOBKEY);}catch(x){}renderPlanner();return;}\n const o=e.target.closest(\'[data-open]\');\n if(o){if(view!==\'asset\')prevView=view;if(prevView===\'status\'||prevView===\'review\'||prevView===\'planner\')day=(prevView===\'planner\'?planDate:N-1);selected=o.dataset.open;view=\'asset\';render();window.scrollTo(0,0);return;}\n if(e.target.id===\'back\'){view=prevView;render();window.scrollTo(0,0);return;}\n const f=e.target.closest(\'[data-f]\');if(f){filter=f.dataset.f;render();return;}\n const nav=e.target.closest(\'[data-view]\');if(nav){view=nav.dataset.view;render();window.scrollTo(0,0);}\n});\ndocument.addEventListener(\'keydown\',e=>{if((e.key===\'Enter\'||e.key===\' \')&&e.target.classList&&e.target.classList.contains(\'cardlink\')){e.preventDefault();e.target.click();}});\nel(\'theme\').onclick=()=>{const d=document.documentElement.dataset.theme===\'dark\';document.documentElement.dataset.theme=d?\'light\':\'dark\';el(\'theme\').textContent=d?\'Dark theme\':\'Light theme\';};\nrender();\n\n</script></body></html>'
+HEAD=('<!doctype html>\n<html lang="en" data-theme="light"><head><meta charset="utf-8">'
+      '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+      '<title>Headway — Fleet decisions</title>\n'
+      '<link rel="preconnect" href="https://fonts.googleapis.com">'
+      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+      '<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">\n')
+
+def render(payload):
+    css=(UI/"app.css").read_text(encoding="utf-8")
+    shell=(UI/"shell.html").read_text(encoding="utf-8")
+    js=(UI/"app.js").read_text(encoding="utf-8")
+    encoded=json.dumps(payload,separators=(",",":"),allow_nan=False).replace("<","\\u003c")
+    return (HEAD+"<style>\n"+css+"</style></head><body>"+shell
+            +'<script type="application/json" id="payload">'+encoded+"</script>\n"
+            +"<script>\n"+js+"\n</script></body></html>")
 
 def main():
     df=pd.read_parquet(DATA/"door_deferral.parquet")
     payload=build_payload(df,AspectPolicy())
+    insp=payload.get("inspection")
+    if insp and insp.get("unavailable"):
+        print("Inspection evidence UNAVAILABLE — rebuild required:")
+        for p in insp["problems"]: print("  - "+p)
+    elif insp:
+        if insp["unavailableDoors"]:
+            print(f"Inspection evidence: {len(insp['unavailableDoors'])} surfaced door(s) "
+                  "carry an unavailable reason instead of an assessment.")
+        for p in insp["doorProblems"]: print("  - "+p)
     selection_path=DATA/"rul_selection.json"
     if selection_path.exists():
         selection=json.loads(selection_path.read_text(encoding="utf-8"))
         if not selection.get("qualified",False):
             payload["scope"] += " Timing model is a fallback; read timings as indicative."
-    encoded=json.dumps(payload,separators=(",",":"),allow_nan=False).replace("<","\\u003c")
-    OUT.write_text(TEMPLATE.replace("__PAYLOAD__",encoded),encoding="utf-8")
+    OUT.write_text(render(payload),encoding="utf-8")
     print(f"Dashboard refreshed: {len(payload['assets'])} doors; explicit unknown states and window comparisons.")
     return 0
 if __name__=="__main__": raise SystemExit(main())

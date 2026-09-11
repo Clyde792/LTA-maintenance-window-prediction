@@ -1,0 +1,470 @@
+{
+  "asset_id": "TRN100-DOOR-1",
+  "subsystem": "door",
+  "as_of": "2026-09-10T16:00:00+00:00",
+  "model_version": "synthetic-cases-seed-20260911",
+  "policy": {
+    "recent_days": 5,
+    "reference_days": 21,
+    "settling_days": 0,
+    "min_recent_days": 3,
+    "min_reference_days": 10,
+    "shift_sigma": 2.0,
+    "peer_share_sigma": 1.0,
+    "min_peers": 3,
+    "min_context_days": 3,
+    "min_overlap_days": 3,
+    "min_matched_days": 5,
+    "min_channel_completeness": 0.9,
+    "location_offset_sigma": 1.0,
+    "affine_tolerance": 1e-06,
+    "context_tolerance": {
+      "ambient_temp_c_mean": 3.0,
+      "load_proxy_mean": 0.15,
+      "hour_of_day_mean": 2.0
+    }
+  },
+  "window": {
+    "reference_start": "2026-08-15T16:00:00+00:00",
+    "reference_end": "2026-09-05T16:00:00+00:00",
+    "recent_start": "2026-09-05T16:00:00+00:00",
+    "recent_end": "2026-09-10T16:00:00+00:00"
+  },
+  "quality_basis": {
+    "basis": "global_data_quality_ok",
+    "columns": {},
+    "blocking_metadata": [
+      "quality_ready (the pipeline's channel-agnostic readiness flag)",
+      "a completeness column for cycle_duration_s",
+      "a completeness column for peak_current_a",
+      "a completeness column for mean_current_a",
+      "a completeness column for current_integral_as",
+      "a completeness column for travel_mm"
+    ],
+    "reason": "a channel-specific assessment needs metadata this frame does not carry, so the global rejection stands: quality_ready (the pipeline's channel-agnostic readiness flag); a completeness column for cycle_duration_s; a completeness column for peak_current_a; a completeness column for mean_current_a; a completeness column for current_integral_as; a completeness column for travel_mm"
+  },
+  "observed_changes": {
+    "cycle_duration_s": {
+      "channel": "cycle_duration_s",
+      "unit": "s",
+      "family": "timing",
+      "attributable_family": "timing",
+      "quality_basis": {
+        "basis": "global_data_quality_ok",
+        "checks_applied": [
+          "context_supported",
+          "data_quality_ok (global; a channel-specific assessment needs metadata this frame does not carry, so the global rejection stands: quality_ready (the pipeline's channel-agnostic readiness flag); a completeness column for cycle_duration_s; a completeness column for peak_current_a; a completeness column for mean_current_a; a completeness column for current_integral_as; a completeness column for travel_mm)"
+        ],
+        "blocking_metadata": [
+          "quality_ready (the pipeline's channel-agnostic readiness flag)",
+          "a completeness column for cycle_duration_s",
+          "a completeness column for peak_current_a",
+          "a completeness column for mean_current_a",
+          "a completeness column for current_integral_as",
+          "a completeness column for travel_mm"
+        ],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "increase",
+      "reference_median": 0.010620728361306446,
+      "recent_median": 0.21027289872153335,
+      "change": 0.1996521703602269,
+      "reference_scale": 0.03988321902791047,
+      "change_in_reference_sigma": 5.005919161653159
+    },
+    "peak_current_a": {
+      "channel": "peak_current_a",
+      "unit": "A",
+      "family": "motor_current",
+      "attributable_family": "motor_current",
+      "quality_basis": {
+        "basis": "global_data_quality_ok",
+        "checks_applied": [
+          "context_supported",
+          "data_quality_ok (global; a channel-specific assessment needs metadata this frame does not carry, so the global rejection stands: quality_ready (the pipeline's channel-agnostic readiness flag); a completeness column for cycle_duration_s; a completeness column for peak_current_a; a completeness column for mean_current_a; a completeness column for current_integral_as; a completeness column for travel_mm)"
+        ],
+        "blocking_metadata": [
+          "quality_ready (the pipeline's channel-agnostic readiness flag)",
+          "a completeness column for cycle_duration_s",
+          "a completeness column for peak_current_a",
+          "a completeness column for mean_current_a",
+          "a completeness column for current_integral_as",
+          "a completeness column for travel_mm"
+        ],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "increase",
+      "reference_median": -0.0009415757883140316,
+      "recent_median": 0.27686615762383426,
+      "change": 0.2778077334121483,
+      "reference_scale": 0.07486955550790109,
+      "change_in_reference_sigma": 3.7105567346774335
+    },
+    "mean_current_a": {
+      "channel": "mean_current_a",
+      "unit": "A",
+      "family": "motor_current",
+      "attributable_family": "motor_current",
+      "quality_basis": {
+        "basis": "global_data_quality_ok",
+        "checks_applied": [
+          "context_supported",
+          "data_quality_ok (global; a channel-specific assessment needs metadata this frame does not carry, so the global rejection stands: quality_ready (the pipeline's channel-agnostic readiness flag); a completeness column for cycle_duration_s; a completeness column for peak_current_a; a completeness column for mean_current_a; a completeness column for current_integral_as; a completeness column for travel_mm)"
+        ],
+        "blocking_metadata": [
+          "quality_ready (the pipeline's channel-agnostic readiness flag)",
+          "a completeness column for cycle_duration_s",
+          "a completeness column for peak_current_a",
+          "a completeness column for mean_current_a",
+          "a completeness column for current_integral_as",
+          "a completeness column for travel_mm"
+        ],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "increase",
+      "reference_median": -0.004306229204269114,
+      "recent_median": 0.15735859548802067,
+      "change": 0.1616648246922898,
+      "reference_scale": 0.05471193693157184,
+      "change_in_reference_sigma": 2.9548364353191117
+    },
+    "current_integral_as": {
+      "channel": "current_integral_as",
+      "unit": "A.s",
+      "family": "motor_current",
+      "attributable_family": null,
+      "quality_basis": {
+        "basis": "global_data_quality_ok",
+        "checks_applied": [
+          "context_supported",
+          "data_quality_ok (global; a channel-specific assessment needs metadata this frame does not carry, so the global rejection stands: quality_ready (the pipeline's channel-agnostic readiness flag); a completeness column for cycle_duration_s; a completeness column for peak_current_a; a completeness column for mean_current_a; a completeness column for current_integral_as; a completeness column for travel_mm)"
+        ],
+        "blocking_metadata": [
+          "quality_ready (the pipeline's channel-agnostic readiness flag)",
+          "a completeness column for cycle_duration_s",
+          "a completeness column for peak_current_a",
+          "a completeness column for mean_current_a",
+          "a completeness column for current_integral_as",
+          "a completeness column for travel_mm"
+        ],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "no_detected_change",
+      "reference_median": 0.08581201320580521,
+      "recent_median": -0.04223954023618037,
+      "change": -0.1280515534419856,
+      "reference_scale": 0.14050443302100088,
+      "change_in_reference_sigma": -0.9113702015568863
+    },
+    "travel_mm": {
+      "channel": "travel_mm",
+      "unit": "mm",
+      "family": "position",
+      "attributable_family": "position",
+      "quality_basis": {
+        "basis": "global_data_quality_ok",
+        "checks_applied": [
+          "context_supported",
+          "data_quality_ok (global; a channel-specific assessment needs metadata this frame does not carry, so the global rejection stands: quality_ready (the pipeline's channel-agnostic readiness flag); a completeness column for cycle_duration_s; a completeness column for peak_current_a; a completeness column for mean_current_a; a completeness column for current_integral_as; a completeness column for travel_mm)"
+        ],
+        "blocking_metadata": [
+          "quality_ready (the pipeline's channel-agnostic readiness flag)",
+          "a completeness column for cycle_duration_s",
+          "a completeness column for peak_current_a",
+          "a completeness column for mean_current_a",
+          "a completeness column for current_integral_as",
+          "a completeness column for travel_mm"
+        ],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "decrease",
+      "reference_median": -0.6032687927473348,
+      "recent_median": -4.701987378123272,
+      "change": -4.098718585375938,
+      "reference_scale": 1.1071298023755358,
+      "change_in_reference_sigma": -3.702112052788605
+    }
+  },
+  "cross_channel": {
+    "shifted_channels": [
+      "cycle_duration_s",
+      "mean_current_a",
+      "peak_current_a",
+      "travel_mm"
+    ],
+    "unchanged_channels": [
+      "current_integral_as"
+    ],
+    "unknown_channels": [],
+    "independent_families": [
+      "motor_current",
+      "position",
+      "timing"
+    ],
+    "n_independent_families": 3,
+    "ambiguous_channels": [],
+    "single_shifted_channel": false,
+    "isolated_channel_shift": false,
+    "confined_to_one_family": false,
+    "wear_orientation_consistent": {
+      "cycle_duration_s": true,
+      "mean_current_a": true,
+      "peak_current_a": true,
+      "travel_mm": true
+    },
+    "all_shifts_wear_consistent": true,
+    "note": "Current-derived channels share one transducer and signal path and are counted as a single family. The charge integral depends on both current and duration, so it corroborates neither. Unknown channels are not channels that stayed put."
+  },
+  "peer_comparison": {
+    "peer_scope": "all other assets in the frame",
+    "target_excluded_from_peers": true,
+    "required_context_columns": [
+      "ambient_temp_c_mean",
+      "load_proxy_mean",
+      "hour_of_day_mean"
+    ],
+    "comparability_status": "resolved",
+    "comparability_reason": null,
+    "peers_considered": 5,
+    "peers_comparable": [
+      "TRN100-DOOR-2",
+      "TRN101-DOOR-1",
+      "TRN101-DOOR-2",
+      "TRN102-DOOR-1",
+      "TRN102-DOOR-2"
+    ],
+    "peers_excluded": {},
+    "sufficient_peer_coverage": true,
+    "channels": {
+      "current_integral_as": {
+        "peers_with_observed_change": 5,
+        "peer_median_change_in_sigma": -0.2666642552223333,
+        "shared_with_peers": false,
+        "status": "observed",
+        "reason": null
+      },
+      "cycle_duration_s": {
+        "peers_with_observed_change": 5,
+        "peer_median_change_in_sigma": -0.6114355864921012,
+        "shared_with_peers": false,
+        "status": "observed",
+        "reason": null
+      },
+      "mean_current_a": {
+        "peers_with_observed_change": 5,
+        "peer_median_change_in_sigma": 4.842508338149166,
+        "shared_with_peers": true,
+        "status": "observed",
+        "reason": null
+      },
+      "peak_current_a": {
+        "peers_with_observed_change": 5,
+        "peer_median_change_in_sigma": 4.148321419580127,
+        "shared_with_peers": true,
+        "status": "observed",
+        "reason": null
+      },
+      "travel_mm": {
+        "peers_with_observed_change": 5,
+        "peer_median_change_in_sigma": 0.1681189779421633,
+        "shared_with_peers": false,
+        "status": "observed",
+        "reason": null
+      }
+    },
+    "shared_channels": [
+      "mean_current_a",
+      "peak_current_a"
+    ],
+    "not_shared_channels": [
+      "current_integral_as",
+      "cycle_duration_s",
+      "travel_mm"
+    ],
+    "unknown_channels": [],
+    "note": "A change shared with comparable peers is evidence of a common influence - duty, environment, timetable or a fleet-wide change. It is not proof that the target's sensor failed. A channel is reported as not shared only where that channel has enough comparable peer evidence; otherwise it is unknown."
+  },
+  "reference_comparison": {
+    "quantifiable": false,
+    "reason": "no reference views supplied; the adaptation effect is not visible",
+    "views": {},
+    "provenance": {},
+    "matched_days": {},
+    "channels": {},
+    "parameter_source": null,
+    "verified_model_identity": false,
+    "demonstration": null,
+    "note": "A stable adapted baseline is not proof of health. The adapted and frozen indices are standardised by different scales, so their difference is not a quantity; only a baseline location difference in residual units, or on an explicitly named shared scale, is meaningful. A scale-only difference is not contamination evidence."
+  },
+  "observations": [
+    {
+      "id": "OBS1",
+      "kind": "change",
+      "observation": "cycle_duration_s increase of +0.1997 s (+5.01 reference sigma) against its own 21-day reference"
+    },
+    {
+      "id": "OBS2",
+      "kind": "change",
+      "observation": "mean_current_a increase of +0.1617 A (+2.95 reference sigma) against its own 21-day reference"
+    },
+    {
+      "id": "OBS3",
+      "kind": "change",
+      "observation": "peak_current_a increase of +0.2778 A (+3.71 reference sigma) against its own 21-day reference"
+    },
+    {
+      "id": "OBS4",
+      "kind": "change",
+      "observation": "travel_mm decrease of -4.099 mm (-3.70 reference sigma) against its own 21-day reference"
+    },
+    {
+      "id": "OBS5",
+      "kind": "multi_family",
+      "observation": "channels from 3 physically distinct families shifted together: motor_current, position, timing"
+    },
+    {
+      "id": "OBS6",
+      "kind": "wear_consistent",
+      "observation": "every shift is in the direction the contract associates with wear for that channel"
+    },
+    {
+      "id": "OBS7",
+      "kind": "peer_shared",
+      "observation": "5 comparable peers with supported evidence in mean_current_a show the same direction of change"
+    },
+    {
+      "id": "OBS8",
+      "kind": "peer_shared",
+      "observation": "5 comparable peers with supported evidence in peak_current_a show the same direction of change"
+    },
+    {
+      "id": "OBS9",
+      "kind": "peer_not_shared",
+      "observation": "5 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+    },
+    {
+      "id": "OBS10",
+      "kind": "peer_not_shared",
+      "observation": "5 comparable peers with supported evidence in travel_mm do not show the same direction of change"
+    },
+    {
+      "id": "OBS11",
+      "kind": "missing",
+      "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+    }
+  ],
+  "missing_evidence": [
+    "reference comparison: no reference views supplied; the adaptation effect is not visible"
+  ],
+  "explanations": [
+    {
+      "explanation": "sensor_or_measurement_change_on_this_door",
+      "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+      "supported_by": [
+        "OBS10",
+        "OBS9"
+      ],
+      "contradicted_by": [
+        "OBS7",
+        "OBS8"
+      ],
+      "suggested_inspection_evidence": [
+        "Independent re-measurement of the affected channel on a few cycles",
+        "Records of any door control unit, sensor, wiring or firmware change since the reference window",
+        "Whether the same channel on the opposite leaf or paired door shows the shift"
+      ]
+    },
+    {
+      "explanation": "mechanical_change_on_this_door",
+      "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: cycle_duration_s, travel_mm.",
+      "supported_by": [
+        "OBS10",
+        "OBS5",
+        "OBS6",
+        "OBS9"
+      ],
+      "contradicted_by": [
+        "OBS7",
+        "OBS8"
+      ],
+      "suggested_inspection_evidence": [
+        "Recorded observations of movement quality on a sample of cycles",
+        "Maintenance and parts history for this door since the reference window",
+        "Whether the affected channels continue to move together over the next few days"
+      ]
+    },
+    {
+      "explanation": "common_influence_across_doors",
+      "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault. Comparable peers show the same direction of change in: mean_current_a, peak_current_a.",
+      "supported_by": [
+        "OBS7",
+        "OBS8"
+      ],
+      "contradicted_by": [
+        "OBS10",
+        "OBS9"
+      ],
+      "suggested_inspection_evidence": [
+        "Whether the shift starts on the same date across the comparable peers",
+        "Timetable, duty roster or service pattern changes covering the same dates",
+        "Fleet-wide software, calibration or configuration change records"
+      ]
+    },
+    {
+      "explanation": "reference_contamination",
+      "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+      "supported_by": [],
+      "contradicted_by": [],
+      "suggested_inspection_evidence": [
+        "Inspection or maintenance evidence covering the reference window itself",
+        "The frozen fleet baseline parameters for the same asset-days, alongside the adapted ones",
+        "Any commissioning or post-overhaul record explaining a persistent offset"
+      ]
+    },
+    {
+      "explanation": "cannot_distinguish",
+      "statement": "The available observations do not separate the explanations above.",
+      "supported_by": [
+        "OBS11"
+      ],
+      "contradicted_by": [],
+      "suggested_inspection_evidence": [
+        "The evidence named under 'missing_evidence' for this assessment",
+        "Continued observation until the unknown channels become supported"
+      ]
+    }
+  ],
+  "explanation_order": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+  "inspection_suggestions_status": "illustrative, pending operator review",
+  "safeguards": {
+    "identifies_root_cause": false,
+    "suppresses_alerts": false,
+    "reduces_urgency": false,
+    "authorises_deferral": false,
+    "release_to_service": false,
+    "changes_detector_or_thresholds": false,
+    "prescribes_maintenance_procedure": false
+  },
+  "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+  "evidence_hash": "c63636d93ae029cbae9e524c07f1d6ba43f533b3ec48bdfe4a812cc894982d6b"
+}

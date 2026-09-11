@@ -42,6 +42,9 @@ def test_duty_fields_are_carried_through():
         "decision_stability":["HIGH"],"duty":["off_peak_only"],"duty_reason":["level"],
         "peak_index":[41.],"offpeak_index":[28.],"load_sensitivity_t":[6.2],"load_sensitive":[True],
         "duty_bands":["06:00–10:00, 16:00–20:00"],"threshold":[39.1]})
+    d["available_at"] = d.day + pd.Timedelta(days=1)
+    d["data_quality_ok"] = True
+    d["context_supported"] = True
     payload=build_payload(d,AspectPolicy())
     row=payload["assets"][0]["rows"][0]
     assert row["duty"]=="off_peak_only" and row["sensitive"] and row["peakHi"]==41.

@@ -205,34 +205,124 @@ Four views, plain-language throughout:
   recently escalated and now recovered ("confirm the repair held"), or sitting at
   the plan-ahead level.
 - **Planner** — the engineering window for a chosen night, and the only place a
-  decision is *recorded*. A **job** is the operator's object, not the model's:
-  `open` (flagged, uncommitted) → `planned` (committed to a night) → `done`.
-  Jobs are added from Status or from the Planner's own "flagged, not planned"
-  list, reordered with the arrows, and closed with **Done**. A planned job that
-  was never marked done **carries forward on its own** — it reappears on every
-  later night tagged *carried from <date> · N nights late*, until someone closes
-  it. Job state is keyed by door, not by date, and lives in the browser; in a
-  real deployment it belongs in the operator's work-order system.
-- **What a rollover costs.** A carried job is priced against the *same* lower
-  bound the card shows: "another night is still inside the estimated lower
-  margin", or "no positive margin left — another night is outside it". No new
-  quantity is invented, and the two can never disagree. A job whose escalation is
-  *held* (retained from an earlier day because current evidence cannot clear it)
-  says so, and prints what today's evidence alone would give — otherwise a
-  `WITHDRAW` job carrying a large margin reads as a contradiction.
-- **Deliberately absent: job durations.** There is no repair-time data anywhere in
-  the contract, and `fault_mode` only exists *at* the confirmed fault, so a
-  duration cannot be inferred from telemetry. Standard job times are an operator
-  input, and whether the maintenance records carry work start/end timestamps is a
-  site-visit question. Until one of those lands, the Planner counts jobs and does
-  not pretend to budget minutes.
+  decision is *recorded*.
+
+  A **job** is the operator's object, not the model's, and it has **its own id**.
+  One door can carry several jobs over its life, so a fresh escalation after a
+  completed repair raises a **new candidate** rather than being suppressed by the
+  old one — it is listed as *new escalation · N earlier jobs on this door*.
+
+  Job state is **event-sourced**: `planned`, `rescheduled`, `work_done`,
+  `verified`, `removed` and `reopened` are appended with the night they happened
+  on, and nothing is overwritten. The plan for any night is replayed from the
+  events up to that night, so stepping back to an earlier window shows what was
+  actually outstanding *then*, not what the job became later. A planned job that
+  was never closed carries forward on its own until someone closes it.
+
+  Completion is two steps, because they are two different facts: **Work done**
+  and then **Verified — back in service**. Removal is undoable, "Clear all jobs"
+  names its scope and asks, and every write is read back so a blocked store says
+  *Not saved* instead of failing silently.
+
+- **Capacity.** Each job carries an estimated duration; the window has a length
+  and a crew count. The header reads *95 of 120 minutes allocated · 1 crew*, and
+  the jobs past the line are marked *would roll over*, each re-priced against the
+  **next** window rather than tonight's. Durations, window length and crew size
+  are **illustrative operator inputs, not model outputs** — nothing in the
+  telemetry implies them, and the page says so.
+
+- **What a rollover costs**, in hours rather than a slogan: *"Next window opens
+  in 25 hours; estimated lower margin 19 hours; exceeds margin by 6 hours."* The
+  margin is the same lower bound the card shows, rounded down, and any overrun is
+  rounded up, so neither figure can flatter the bound. A 0.8-day margin is
+  correctly reported as positive-but-short rather than as "no margin". Missing
+  evidence stays explicit. A **held** escalation prints what today's evidence
+  alone would give, so `WITHDRAW` beside a large margin is not read as a bug.
+
 - **Door detail** — the wear-level chart *is* the date scrubber (drag it), with a
   fault-level line, the full card at that day, and a Back button.
 
-The date slider lives only on Fleet. Card language: "safe time left" (the lower
-bound), a "wear now / fault at" gauge, "can the fix wait?" (the window
-comparison), and the fit-for-duty flag. Chart gaps preserved; one "demo,
-simulated data" line; light + dark.
+**Status** and **Review** are compact scan rows — *Door · Action · Reason ·
+Next window · Job* — that expand in place for the chart, the evidence and the
+alternative windows. The date slider lives only on Fleet; the door chart is its
+own scrubber. There is a train/door search, every door name is a real button,
+no control is nested inside another, keyboard focus survives a re-render, and
+no operational label is smaller than 11px.
+
+Wording is deliberately hedged where the quantity is learned rather than
+physical: **learned threshold** (not "fault level"), **estimated lower margin**,
+**within / exceeds estimated margin**, and a standing header —
+*Replay — observations through 2026-07-29; daily aggregate available
+2026-07-30 00:00 SGT* — so the page never implies it is live.
+
+### Repair verification — `headway/repair_verification.py`, exported by `scripts/build_verification.py`
+
+A separate question from "when will it fail": *did the repair actually hold?* The
+backend compares each condition-normalised channel over the first complete days
+after maintenance against an explicitly reviewed healthy reference for that same
+door, and returns **signal recovered**, **abnormality persists**, or
+**insufficient evidence**.
+
+- **How it reaches a static page.** It cannot: the module is Python over SQLite.
+  `scripts/build_verification.py` runs the real backend at build time and writes
+  `data/verification_export.json`, which `build_ui.py` inlines. The page carries a
+  snapshot and says so — *"Verification snapshot exported … — refresh requires
+  rebuild."* A live two-way connection would need a server, which is the
+  deployment path, not the demonstration.
+- **Two stores, and only one of them is ever written.** The operational store
+  `data/repair_verification.sqlite` is **read only** here; the exporter never
+  creates, rewrites or deletes it. Demonstration records live in a separate
+  `data/repair_verification_demo.sqlite`, which `--seed-demo` rebuilds. The
+  rebuild chain passes `--seed-demo`, so a routine rebuild refreshes the
+  demonstration and leaves real maintenance history untouched.
+
+  Three guards make that structural rather than conventional, and each has a test:
+
+  1. **Read-only is enforced by SQLite**, not by intent. Reads open the file
+     through `mode=ro`, so a write is impossible at the driver level, and the
+     schema is validated first — pointing `--store-db` at an unrelated database
+     is refused rather than quietly having the store's tables created inside it.
+  2. **Aliased paths are refused before anything is deleted.** `--store-db`,
+     `--demo-db` and `--out` are resolved and compared, so
+     `--seed-demo --demo-db <the operational store>` cannot wipe real history.
+  3. **Job-id collisions across the two stores are refused.** `job_id` is the key
+     the dashboard joins on, so a silent merge would hand one store's maintenance
+     record to the other store's assessment. Namespacing would break the join;
+     the export fails instead and names the offending ids.
+- **Job-level matching.** A door can carry several repairs over its life, so an
+  assessment is joined on **both** `job_id` and `asset_id`. A planner job with no
+  assessment of its own reads **Not assessed** — it cannot inherit an older
+  repair's "Signal recovered". Other work on the same door stays visible, but
+  separately and labelled (*"2 earlier assessments on this door"*).
+- **Times are shown in Asia/Singapore, labelled SGT.** The store keeps UTC;
+  truncating those ISO strings would have shown an assessment made at 12 July
+  06:00 SGT as 11 July 22:00, and shifted the observation-window dates with it.
+- **The replay clock gates it.** Each assessment is exported with a `visibleFrom`
+  night computed from its own `as_of`, so scrubbing back never reveals a result
+  before it existed. `tests/test_verification_export.py` pins the boundary.
+- **It is evidence, never authority.** `release_to_service` is always false.
+  Returning a door to traffic is an operator action recorded in the planner
+  ("Returned to service"); telemetry recovery does not authorise it and the two
+  are displayed as separate lines. A door with no assessment reads **Not
+  assessed** — never "recovered" by default.
+- **Open follow-ups outlive good news.** A persistent result opens a follow-up
+  keyed to the job that raised it. A later *recovered* assessment on the same job
+  does not close it; the page shows both, and closure is a human decision. The
+  demonstration contains exactly this sequence.
+- **The demonstration is labelled, not invented.** Three cases are *searched* for
+  rather than hard-coded — candidate doors and assessment times are dry-run
+  through `verify_repair` and the first combination that genuinely produces the
+  wanted status is committed — so the backend decides the outcome and the demo
+  survives regenerating the simulator. Operator and reviewer fields read
+  `SIMULATED — no inspection took place`; no engineer is named and no maintenance
+  history is implied.
+
+**Source layout.** The page ships as one self-contained HTML file, but the source
+is not one string: `scripts/ui/shell.html`, `scripts/ui/app.css` and
+`scripts/ui/app.js` are ordinary files that `scripts/build_ui.py` inlines. The
+margin formatter in `app.js` is written as a single `const safe=` expression
+because `scripts/check_artifacts.py` extracts and executes it against boundary
+values to prove the display never rounds a bound upward.
 
 ---
 

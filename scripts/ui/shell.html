@@ -1,0 +1,27 @@
+<div class="wrap"><div class="app">
+<aside class="side">
+<div class="brand">HEAD<span class="chev">&lsaquo;&rsaquo;</span>WAY<small>Time to act</small></div>
+<nav id="nav" aria-label="Views">
+<button class="nav-item" data-view="status">Status <span class="badge" id="b-status"></span></button>
+<button class="nav-item" data-view="review">Review <span class="badge" id="b-review"></span></button>
+<button class="nav-item" data-view="planner">Planner <span class="badge" id="b-planner"></span></button>
+<button class="nav-item" data-view="fleet">Fleet <span class="badge" id="b-fleet"></span></button>
+</nav>
+<div class="srch"><label class="vh" for="q">Search train or door</label>
+<input id="q" type="search" placeholder="Search train or door" autocomplete="off" spellcheck="false"></div>
+<button class="btn" id="theme">Dark theme</button>
+<div class="replay" id="replay"></div>
+<div class="save" id="save" role="status" aria-live="polite"></div>
+<div class="hint">Demo &middot; simulated door data</div>
+</aside><main>
+<section id="v-status" class="view"><h2>Status</h2><p class="sub" id="status-sub"></p><div class="rows" id="status-list"></div></section>
+<section id="v-review" class="view"><h2>Review</h2><p class="sub" id="review-sub"></p><div class="rows" id="review-list"></div></section>
+<section id="v-planner" class="view"><h2>Planner</h2>
+<div class="wbar"><button class="btn" id="pl-prev" aria-label="Earlier night">&lsaquo;</button><span id="pl-when"></span><button class="btn" id="pl-next" aria-label="Later night">&rsaquo;</button>
+<span class="wcap" id="pl-cap"></span><button class="btn" id="pl-clear">Clear all jobs</button></div>
+<div class="capbar"><div id="capfill"></div></div>
+<p class="hint">Window length, crew size and job minutes are illustrative operator inputs, not model outputs. Confirm them with the depot.</p>
+<p class="sub" id="plan-sub"></p><div id="plan-list"></div></section>
+<section id="v-fleet" class="view"><h2>Fleet</h2><div class="scrub"><label for="fday">Date</label><input id="fday" type="range" min="0" step="1" aria-label="Replay date"><span class="date" id="fdate"></span></div><div class="filters" id="filters"></div><div class="fleet" id="fleet"></div></section>
+<section id="v-asset" class="view"><button class="btn back" id="back" hidden>&larr; Back</button><h2>Door detail</h2><div id="detail" class="detail"></div></section>
+</main></div></div>

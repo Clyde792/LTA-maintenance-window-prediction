@@ -22,8 +22,8 @@ def test_onboarding_does_not_mutate_fleet_or_use_labels(setup):
     pipe,target,ready=setup
     ref=target[target.ts<ready]
     original={s:b.loc_.copy() for s,b in pipe.baselines.items()}
-    a=onboard(pipe,ref,as_of=ready)
-    b=onboard(pipe,ref.assign(fault_confirmed=True,fault_mode="invented"),as_of=ready)
+    a=onboard(pipe,ref,experimental=True,as_of=ready)
+    b=onboard(pipe,ref.assign(fault_confirmed=True,fault_mode="invented"),experimental=True,as_of=ready)
     assert a.ready_at and a.ready_at==b.ready_at
     for s in pipe.levels:
         pd.testing.assert_series_equal(pipe.baselines[s].loc_,original[s])
@@ -35,20 +35,20 @@ def test_onboarding_does_not_mutate_fleet_or_use_labels(setup):
 def test_future_reference_is_rejected(setup):
     pipe,target,ready=setup
     with pytest.raises(ValueError,match="unavailable"):
-        onboard(pipe,target,as_of=ready)
+        onboard(pipe,target,experimental=True,as_of=ready)
 
 
 def test_short_reference_abstains(setup):
     pipe,target,ready=setup
     short=target[target.ts<ready-pd.Timedelta(days=5)]
-    a=onboard(pipe,short,as_of=ready)
+    a=onboard(pipe,short,experimental=True,as_of=ready)
     assert a.rejected and not a.ready_at
     assert not a.transform(target).data_quality_ok.any()
 
 
 def test_onboarding_reference_cannot_create_earlier_decisions(setup):
     pipe,target,ready=setup
-    a=onboard(pipe,target[target.ts<ready],as_of=ready)
+    a=onboard(pipe,target[target.ts<ready],experimental=True,as_of=ready)
     pred=a.transform(target)
     assert not pred.loc[pred.available_at<ready,"data_quality_ok"].any()
     assert pred.loc[pred.available_at<ready,"onboarding_status"].eq("reference_not_yet_available").all()
@@ -56,7 +56,7 @@ def test_onboarding_reference_cannot_create_earlier_decisions(setup):
 
 def test_future_target_changes_cannot_change_earlier_predictions(setup):
     pipe,target,ready=setup
-    a=onboard(pipe,target[target.ts<ready],as_of=ready)
+    a=onboard(pipe,target[target.ts<ready],experimental=True,as_of=ready)
     cutoff=ready+pd.Timedelta(days=15)
     before=a.transform(target)
     modified=target.copy()
@@ -71,6 +71,24 @@ def test_equal_group_weight_does_not_change_if_one_group_is_repeated():
     first=weighted_quantile(a+b,[1/3]*3+[1/2]*2,.6)
     repeated=weighted_quantile(a*10+b,[1/30]*30+[1/2]*2,.6)
     assert first==repeated
+
+
+def test_operational_onboarding_requires_review_and_waits_for_it(setup):
+    pipe,target,ready=setup
+    ref=target[target.ts<ready]
+    assert not onboard(pipe,ref,as_of=ready).ready_at
+    reviewed=ready+pd.Timedelta(days=2)
+    records={a: dict(eligible=True, reviewer="Test engineer", evidence_id="inspection-123",
+        reference_start=ref.ts.min().floor("D"), reference_end=ready, reviewed_at=reviewed)
+        for a in ref.asset_id.unique()}
+    assert not onboard(pipe,ref,as_of=ready,provenance=records).ready_at
+    approved=onboard(pipe,ref,as_of=reviewed,provenance=records)
+    assert approved.ready_at and all(t==reviewed for t in approved.ready_at.values())
+    pred=approved.transform(target)
+    assert not pred.loc[pred.available_at<reviewed,"reference_verified"].any()
+    assert not pred.loc[pred.available_at<reviewed,"data_quality_ok"].any()
+    records[next(iter(records))]["evidence_id"]="changed"
+    assert all(r["evidence_id"]=="inspection-123" for r in approved.provenance.values())
 
 
 def test_balanced_calibration_keeps_held_out_labels_out(monkeypatch):

@@ -28,21 +28,58 @@ The dashboard opens on **Status** - the doors needing action tonight - with
 that holds tonight's engineering window, a **Fleet** grid, and a **Door detail**
 view whose wear chart doubles as the date scrubber.
 
-The Planner is where a decision gets recorded rather than just displayed. Jobs go
-in from Status, get ordered, and close with **Done**. Anything not closed
-**carries to the next night by itself**, tagged with how late it now is — and
-priced against the same lower bound the card shows:
+The Planner is where a decision gets recorded rather than just displayed. Jobs
+go in from Status, get ordered against the window's capacity, and close in two
+steps — *work done*, then *verified back in service*. Anything not closed
+**carries to the next night by itself**, and is re-priced in hours against the
+same lower bound the card shows:
 
 ```
-TRN025-DOOR-2   WITHDRAW · at least 41.7 d
-   carried from 2026-07-26 · 3 nights late
-   Another night is still inside the estimated lower margin.
+TRN025-DOOR-2   WITHDRAW   carried from 2026-07-26 · 3 nights late
+   Next window opens in 25 hours; estimated lower margin 19 hours;
+   exceeds margin by 6 hours.
 ```
 
 That is the honest version of the survival curve the audit removed: no
-probability, just *this delay is, or is not, inside the estimated margin*. We do
-not estimate repair durations — no repair-time data exists in the contract, and
-inventing one would be the same mistake.
+probability, just *this delay is, or is not, inside the estimated margin*.
+
+Two properties matter more than they look. A **job has its own identity**, so a
+door that fails again after a completed repair raises a *new* candidate instead
+of being hidden by the old one. And job state is **event-sourced**, so stepping
+back to last Tuesday shows the plan as it stood on Tuesday rather than as it
+ended up. Job durations, window length and crew size are illustrative operator
+inputs, labelled as such — the telemetry cannot imply them.
+
+### Did the repair hold?
+
+Prediction is only half a maintenance loop. Headway also compares each door's
+condition-normalised channels after maintenance against an explicitly reviewed
+healthy reference for that same door, and reports one of three things —
+**signal recovered**, **abnormality persists**, **insufficient evidence** — with
+the observation window, the reason and the per-channel departures:
+
+```
+Abnormality persists                         job DEMO-PERSISTENT-1
+Repeated reference departures: current_integral_as_hx, cycle_duration_s_hx …
+window 2026-07-25 → 2026-07-28, 3 complete days observed
+Motor charge per cycle   41.6x scale · 3 abnormal days
+Open follow-up — a later favourable assessment does not close it.
+```
+
+A door with no assessment reads **Not assessed**, never "recovered". A persistent
+result opens a follow-up that a later good result cannot silently close. And the
+check has no authority over service: returning a door to traffic stays an
+operator action, recorded separately in the planner.
+
+Each assessment is joined to **both** the job and the door, so a new repair never
+inherits an older repair's verdict; without an assessment of its own a job reads
+*Not assessed*. Times are shown in SGT rather than raw UTC.
+
+The dashboard is a static file, so this is a snapshot exported at build time and
+labelled as one. The cases shown are simulated maintenance on synthetic
+telemetry — the outcomes are produced by the real backend, but no inspection took
+place and no engineer is named. Demonstration records live in their own database;
+the operational store is only ever read.
 
 Every door gets a **signal aspect** in the four-aspect language railways already
 use — GREEN `MONITOR` / DOUBLE AMBER `PLAN` / AMBER `TONIGHT` / RED `WITHDRAW` —

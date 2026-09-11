@@ -1,0 +1,226 @@
+{
+  "exportedAt": "2026-09-11T14:43:16.160088+08:00",
+  "modelVersion": "sha256:e59fdad0542cd497",
+  "sources": {
+    "operational": null,
+    "demonstration": "repair_verification_demo.sqlite"
+  },
+  "hasOperationalRecords": false,
+  "note": "Simulated maintenance on synthetic telemetry. No inspection or repair took place; operator and reviewer fields are placeholders, not attestations.",
+  "assessments": [
+    {
+      "as_of": "2026-07-06T22:00:00+00:00",
+      "assessment_id": "6849db3a-8b23-4aba-9382-189e2355d56b",
+      "asset_id": "TRN038-DOOR-2",
+      "channels": {
+        "current_integral_as_hx": {
+          "abnormal_days": 3,
+          "max_absolute_deviation": 10.902797384918617,
+          "median_absolute_deviation": 8.235530148192678
+        },
+        "cycle_duration_s_hx": {
+          "abnormal_days": 3,
+          "max_absolute_deviation": 8.182296594952632,
+          "median_absolute_deviation": 4.6419594410894165
+        },
+        "peak_current_a_hx": {
+          "abnormal_days": 3,
+          "max_absolute_deviation": 5.978030073115857,
+          "median_absolute_deviation": 3.6498708249842733
+        },
+        "travel_mm_hx": {
+          "abnormal_days": 1,
+          "max_absolute_deviation": 3.292685122805338,
+          "median_absolute_deviation": 1.469855355497326
+        }
+      },
+      "evidence_hash": "81d9b51b24599fcc9335e5df3c1a72a388cb921f0d77473661c295d3caa05d12",
+      "follow_up_required": true,
+      "job_id": "DEMO-RECOVERED-1",
+      "limitation": "Experimental signal check; not causal proof of repair effectiveness or service clearance.",
+      "model_version": "sha256:e59fdad0542cd497",
+      "observed_days": 3,
+      "policy": {
+        "deviation_limit": 3.0,
+        "persistent_days": 2,
+        "post_days": 3,
+        "reference_days": 14,
+        "settling_days": 1
+      },
+      "reason": "Repeated reference departures: current_integral_as_hx, cycle_duration_s_hx, peak_current_a_hx",
+      "reference_id": "807d42d7b5c84bfaffe0fd04fff26ed70a477ebfe9dda63e7e39b5343e33c7da",
+      "release_to_service": false,
+      "status": "abnormality_persists",
+      "window_end": "2026-07-06T16:00:00+00:00",
+      "window_start": "2026-07-03T16:00:00+00:00",
+      "demo": true,
+      "demo_purpose": "Earlier assessment of the same job, while the repair was still settling. It opened a follow-up."
+    },
+    {
+      "as_of": "2026-07-11T22:00:00+00:00",
+      "assessment_id": "5af29423-89e8-41bd-9e57-766b225801cb",
+      "asset_id": "TRN038-DOOR-2",
+      "channels": {
+        "current_integral_as_hx": {
+          "abnormal_days": 0,
+          "max_absolute_deviation": 2.4508740040640147,
+          "median_absolute_deviation": 1.1129013244377897
+        },
+        "cycle_duration_s_hx": {
+          "abnormal_days": 0,
+          "max_absolute_deviation": 0.32748829678459657,
+          "median_absolute_deviation": 0.21556124015553602
+        },
+        "peak_current_a_hx": {
+          "abnormal_days": 0,
+          "max_absolute_deviation": 2.034697477880597,
+          "median_absolute_deviation": 0.2428776416551444
+        },
+        "travel_mm_hx": {
+          "abnormal_days": 0,
+          "max_absolute_deviation": 1.368603700936099,
+          "median_absolute_deviation": 1.1230378844428774
+        }
+      },
+      "evidence_hash": "43e77acc485b89832888c5d2ef56475d5ec1a7cb3a5cffc34d4d6c28a1f837cd",
+      "follow_up_required": false,
+      "job_id": "DEMO-RECOVERED-1",
+      "limitation": "Experimental signal check; not causal proof of repair effectiveness or service clearance.",
+      "model_version": "sha256:e59fdad0542cd497",
+      "observed_days": 3,
+      "policy": {
+        "deviation_limit": 3.0,
+        "persistent_days": 2,
+        "post_days": 3,
+        "reference_days": 14,
+        "settling_days": 1
+      },
+      "reason": "All monitored channels remain within reference limits throughout the recent window",
+      "reference_id": "807d42d7b5c84bfaffe0fd04fff26ed70a477ebfe9dda63e7e39b5343e33c7da",
+      "release_to_service": false,
+      "status": "signal_recovered",
+      "window_end": "2026-07-11T16:00:00+00:00",
+      "window_start": "2026-07-08T16:00:00+00:00",
+      "demo": true,
+      "demo_purpose": "Successful repair: every monitored channel is back inside the healthy reference. The follow-up opened by the earlier assessment stays open \u2014 only a person closes it."
+    },
+    {
+      "as_of": "2026-07-28T22:00:00+00:00",
+      "assessment_id": "3dfd668a-d4a4-41aa-ad85-3ad47f585167",
+      "asset_id": "TRN021-DOOR-2",
+      "channels": {
+        "current_integral_as_hx": {
+          "abnormal_days": 3,
+          "max_absolute_deviation": 41.59545863156846,
+          "median_absolute_deviation": 38.697258487722166
+        },
+        "cycle_duration_s_hx": {
+          "abnormal_days": 3,
+          "max_absolute_deviation": 41.573610351661074,
+          "median_absolute_deviation": 37.449764527877285
+        },
+        "peak_current_a_hx": {
+          "abnormal_days": 3,
+          "max_absolute_deviation": 35.14436627591572,
+          "median_absolute_deviation": 33.20659387750622
+        },
+        "travel_mm_hx": {
+          "abnormal_days": 3,
+          "max_absolute_deviation": 18.974580406655843,
+          "median_absolute_deviation": 18.866131183908827
+        }
+      },
+      "evidence_hash": "fb9702110524b6a42c6bda77d1741d0de143ac522239d5d6287cb2955dad7d5f",
+      "follow_up_required": true,
+      "job_id": "DEMO-PERSISTENT-1",
+      "limitation": "Experimental signal check; not causal proof of repair effectiveness or service clearance.",
+      "model_version": "sha256:e59fdad0542cd497",
+      "observed_days": 3,
+      "policy": {
+        "deviation_limit": 3.0,
+        "persistent_days": 2,
+        "post_days": 3,
+        "reference_days": 14,
+        "settling_days": 1
+      },
+      "reason": "Repeated reference departures: current_integral_as_hx, cycle_duration_s_hx, peak_current_a_hx, travel_mm_hx",
+      "reference_id": "1ef3648aeaf2724936057f3799d2794c820a43b41f2ef30f0bf40e46ad26d026",
+      "release_to_service": false,
+      "status": "abnormality_persists",
+      "window_end": "2026-07-28T16:00:00+00:00",
+      "window_start": "2026-07-25T16:00:00+00:00",
+      "demo": true,
+      "demo_purpose": "Abnormality persists: the signal did not return to the reference; a follow-up review is open."
+    },
+    {
+      "as_of": "2026-07-28T22:00:00+00:00",
+      "assessment_id": "73123687-fb9c-4595-988c-7804ea7667a5",
+      "asset_id": "TRN025-DOOR-2",
+      "channels": {},
+      "follow_up_required": false,
+      "job_id": "DEMO-INSUFFICIENT-1",
+      "limitation": "Experimental signal check; not causal proof of repair effectiveness or service clearance.",
+      "model_version": "sha256:e59fdad0542cd497",
+      "observed_days": 0,
+      "policy": {
+        "deviation_limit": 3.0,
+        "persistent_days": 2,
+        "post_days": 3,
+        "reference_days": 14,
+        "settling_days": 1
+      },
+      "reason": "waiting for settling period and complete post-maintenance days",
+      "reference_id": "c3a110663713d23c3ef1e00d6c16e812c1d9fa6a2a41488090eeba04a568cc51",
+      "release_to_service": false,
+      "status": "insufficient_evidence",
+      "demo": true,
+      "demo_purpose": "Insufficient evidence: the settling interval and three complete days have not elapsed."
+    }
+  ],
+  "records": {
+    "DEMO-RECOVERED-1": {
+      "asset_id": "TRN038-DOOR-2",
+      "completed_at": "2026-07-01T19:00:00+00:00",
+      "finding": "SIMULATED finding \u2014 not a real inspection",
+      "job_id": "DEMO-RECOVERED-1",
+      "operator": "SIMULATED \u2014 no inspection took place (synthetic demonstration data)",
+      "recorded_at": "2026-07-01T19:30:00+00:00",
+      "started_at": "2026-07-01T17:00:00+00:00",
+      "work_performed": "SIMULATED work record \u2014 no maintenance was performed"
+    },
+    "DEMO-PERSISTENT-1": {
+      "asset_id": "TRN021-DOOR-2",
+      "completed_at": "2026-07-23T19:00:00+00:00",
+      "finding": "SIMULATED finding \u2014 not a real inspection",
+      "job_id": "DEMO-PERSISTENT-1",
+      "operator": "SIMULATED \u2014 no inspection took place (synthetic demonstration data)",
+      "recorded_at": "2026-07-23T19:30:00+00:00",
+      "started_at": "2026-07-23T17:00:00+00:00",
+      "work_performed": "SIMULATED work record \u2014 no maintenance was performed"
+    },
+    "DEMO-INSUFFICIENT-1": {
+      "asset_id": "TRN025-DOOR-2",
+      "completed_at": "2026-07-27T19:00:00+00:00",
+      "finding": "SIMULATED finding \u2014 not a real inspection",
+      "job_id": "DEMO-INSUFFICIENT-1",
+      "operator": "SIMULATED \u2014 no inspection took place (synthetic demonstration data)",
+      "recorded_at": "2026-07-27T19:30:00+00:00",
+      "started_at": "2026-07-27T17:00:00+00:00",
+      "work_performed": "SIMULATED work record \u2014 no maintenance was performed"
+    }
+  },
+  "followups": [
+    {
+      "job_id": "DEMO-RECOVERED-1",
+      "assessment_id": "6849db3a-8b23-4aba-9382-189e2355d56b",
+      "state": "open",
+      "demo": true
+    },
+    {
+      "job_id": "DEMO-PERSISTENT-1",
+      "assessment_id": "3dfd668a-d4a4-41aa-ad85-3ad47f585167",
+      "state": "open",
+      "demo": true
+    }
+  ]
+}

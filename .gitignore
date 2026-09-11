@@ -8,3 +8,8 @@ data/*.parquet
 .ipynb_checkpoints/
 data/_demo_vendor_export.csv
 data/onboarding_experiment/*.parquet
+
+# Rebuilt from scratch by scripts/build_verification.py on every build; the
+# exported JSON it produces is the artifact the dashboard actually consumes.
+data/repair_verification.sqlite
+data/repair_verification_demo.sqlite

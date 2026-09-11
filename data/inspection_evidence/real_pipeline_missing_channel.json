@@ -1,0 +1,427 @@
+{
+  "asset_id": "TRN001-DOOR-1",
+  "subsystem": "door",
+  "as_of": "2026-06-09T16:00:00+00:00",
+  "model_version": "synthetic-cases-seed-20260911",
+  "policy": {
+    "recent_days": 5,
+    "reference_days": 21,
+    "settling_days": 0,
+    "min_recent_days": 3,
+    "min_reference_days": 10,
+    "shift_sigma": 2.0,
+    "peer_share_sigma": 1.0,
+    "min_peers": 3,
+    "min_context_days": 3,
+    "min_overlap_days": 3,
+    "min_matched_days": 5,
+    "min_channel_completeness": 0.9,
+    "location_offset_sigma": 1.0,
+    "affine_tolerance": 1e-06,
+    "context_tolerance": {
+      "ambient_temp_c_mean": 3.0,
+      "load_proxy_mean": 0.15,
+      "hour_of_day_mean": 2.0
+    }
+  },
+  "window": {
+    "reference_start": "2026-05-14T16:00:00+00:00",
+    "reference_end": "2026-06-04T16:00:00+00:00",
+    "recent_start": "2026-06-04T16:00:00+00:00",
+    "recent_end": "2026-06-09T16:00:00+00:00"
+  },
+  "quality_basis": {
+    "basis": "channel_completeness",
+    "columns": {
+      "cycle_duration_s": "res_cycle_duration_s_completeness",
+      "peak_current_a": "res_peak_current_a_completeness",
+      "mean_current_a": "res_mean_current_a_completeness",
+      "current_integral_as": "res_current_integral_as_completeness",
+      "travel_mm": "res_travel_mm_completeness"
+    },
+    "blocking_metadata": [],
+    "reason": null
+  },
+  "observed_changes": {
+    "cycle_duration_s": {
+      "channel": "cycle_duration_s",
+      "unit": "s",
+      "family": "timing",
+      "attributable_family": "timing",
+      "quality_basis": {
+        "basis": "channel_completeness",
+        "checks_applied": [
+          "context_supported",
+          "quality_ready (pipeline-published channel-agnostic readiness)",
+          "res_cycle_duration_s_completeness in [0,1] and >= 0.9",
+          "data_quality_ok consistent with readiness and completeness"
+        ],
+        "blocking_metadata": [],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "increase",
+      "reference_median": 0.10992207372718443,
+      "recent_median": 0.304833991325445,
+      "change": 0.19491191759826054,
+      "reference_scale": 0.08736593383335878,
+      "change_in_reference_sigma": 2.2309830507853814
+    },
+    "peak_current_a": {
+      "channel": "peak_current_a",
+      "unit": "A",
+      "family": "motor_current",
+      "attributable_family": "motor_current",
+      "quality_basis": {
+        "basis": "channel_completeness",
+        "checks_applied": [
+          "context_supported",
+          "quality_ready (pipeline-published channel-agnostic readiness)",
+          "res_peak_current_a_completeness in [0,1] and >= 0.9",
+          "data_quality_ok consistent with readiness and completeness"
+        ],
+        "blocking_metadata": [],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "no_detected_change",
+      "reference_median": 0.38757944349462825,
+      "recent_median": 0.8688003085202656,
+      "change": 0.4812208650256373,
+      "reference_scale": 0.28070530720505144,
+      "change_in_reference_sigma": 1.7143276335495572
+    },
+    "mean_current_a": {
+      "channel": "mean_current_a",
+      "unit": "A",
+      "family": "motor_current",
+      "attributable_family": "motor_current",
+      "quality_basis": {
+        "basis": "channel_completeness",
+        "checks_applied": [
+          "context_supported",
+          "quality_ready (pipeline-published channel-agnostic readiness)",
+          "res_mean_current_a_completeness in [0,1] and >= 0.9",
+          "data_quality_ok consistent with readiness and completeness"
+        ],
+        "blocking_metadata": [],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "increase",
+      "reference_median": 0.029163515022793463,
+      "recent_median": 0.09518789993068744,
+      "change": 0.06602438490789397,
+      "reference_scale": 0.027075597721164076,
+      "change_in_reference_sigma": 2.438519939165921
+    },
+    "current_integral_as": {
+      "channel": "current_integral_as",
+      "unit": "A.s",
+      "family": "motor_current",
+      "attributable_family": null,
+      "quality_basis": {
+        "basis": "channel_completeness",
+        "checks_applied": [
+          "context_supported",
+          "quality_ready (pipeline-published channel-agnostic readiness)",
+          "res_current_integral_as_completeness in [0,1] and >= 0.9",
+          "data_quality_ok consistent with readiness and completeness"
+        ],
+        "blocking_metadata": [],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 0,
+      "recent_days_used": 0,
+      "status": "unknown",
+      "reason": "insufficient supported recent days",
+      "direction": "unknown",
+      "reference_median": null,
+      "recent_median": null,
+      "change": null,
+      "reference_scale": null,
+      "change_in_reference_sigma": null
+    },
+    "travel_mm": {
+      "channel": "travel_mm",
+      "unit": "mm",
+      "family": "position",
+      "attributable_family": "position",
+      "quality_basis": {
+        "basis": "channel_completeness",
+        "checks_applied": [
+          "context_supported",
+          "quality_ready (pipeline-published channel-agnostic readiness)",
+          "res_travel_mm_completeness in [0,1] and >= 0.9",
+          "data_quality_ok consistent with readiness and completeness"
+        ],
+        "blocking_metadata": [],
+        "rows_rejected_for_inconsistent_quality_metadata": 0
+      },
+      "reference_days_used": 21,
+      "recent_days_used": 5,
+      "status": "observed",
+      "reason": null,
+      "direction": "no_detected_change",
+      "reference_median": -1.824507488787276,
+      "recent_median": -4.690704187036886,
+      "change": -2.8661966982496097,
+      "reference_scale": 1.438564042843013,
+      "change_in_reference_sigma": -1.9924011812398612
+    }
+  },
+  "cross_channel": {
+    "shifted_channels": [
+      "cycle_duration_s",
+      "mean_current_a"
+    ],
+    "unchanged_channels": [
+      "peak_current_a",
+      "travel_mm"
+    ],
+    "unknown_channels": [
+      "current_integral_as"
+    ],
+    "independent_families": [
+      "motor_current",
+      "timing"
+    ],
+    "n_independent_families": 2,
+    "ambiguous_channels": [],
+    "single_shifted_channel": false,
+    "isolated_channel_shift": false,
+    "confined_to_one_family": false,
+    "wear_orientation_consistent": {
+      "cycle_duration_s": true,
+      "mean_current_a": true
+    },
+    "all_shifts_wear_consistent": true,
+    "note": "Current-derived channels share one transducer and signal path and are counted as a single family. The charge integral depends on both current and duration, so it corroborates neither. Unknown channels are not channels that stayed put."
+  },
+  "peer_comparison": {
+    "peer_scope": "all other assets in the frame",
+    "target_excluded_from_peers": true,
+    "required_context_columns": [
+      "ambient_temp_c_mean",
+      "load_proxy_mean",
+      "hour_of_day_mean"
+    ],
+    "comparability_status": "resolved",
+    "comparability_reason": null,
+    "peers_considered": 11,
+    "peers_comparable": [
+      "TRN001-DOOR-2",
+      "TRN002-DOOR-1",
+      "TRN002-DOOR-2",
+      "TRN003-DOOR-1",
+      "TRN003-DOOR-2",
+      "TRN004-DOOR-2",
+      "TRN005-DOOR-1",
+      "TRN005-DOOR-2",
+      "TRN006-DOOR-2"
+    ],
+    "peers_excluded": {
+      "TRN004-DOOR-1": "operating context load_proxy_mean not comparable",
+      "TRN006-DOOR-1": "operating context load_proxy_mean not comparable"
+    },
+    "sufficient_peer_coverage": true,
+    "channels": {
+      "current_integral_as": {
+        "peers_with_observed_change": 8,
+        "peer_median_change_in_sigma": 0.1436261033801742,
+        "shared_with_peers": null,
+        "status": "unknown",
+        "reason": "the target's own change in this channel is unknown"
+      },
+      "cycle_duration_s": {
+        "peers_with_observed_change": 9,
+        "peer_median_change_in_sigma": -0.007403350731474931,
+        "shared_with_peers": false,
+        "status": "observed",
+        "reason": null
+      },
+      "mean_current_a": {
+        "peers_with_observed_change": 9,
+        "peer_median_change_in_sigma": 0.24241141052891182,
+        "shared_with_peers": false,
+        "status": "observed",
+        "reason": null
+      },
+      "peak_current_a": {
+        "peers_with_observed_change": 9,
+        "peer_median_change_in_sigma": 0.37588232530691623,
+        "shared_with_peers": false,
+        "status": "observed",
+        "reason": null
+      },
+      "travel_mm": {
+        "peers_with_observed_change": 9,
+        "peer_median_change_in_sigma": 0.4503725067316395,
+        "shared_with_peers": false,
+        "status": "observed",
+        "reason": null
+      }
+    },
+    "shared_channels": [],
+    "not_shared_channels": [
+      "cycle_duration_s",
+      "mean_current_a",
+      "peak_current_a",
+      "travel_mm"
+    ],
+    "unknown_channels": [
+      "current_integral_as"
+    ],
+    "note": "A change shared with comparable peers is evidence of a common influence - duty, environment, timetable or a fleet-wide change. It is not proof that the target's sensor failed. A channel is reported as not shared only where that channel has enough comparable peer evidence; otherwise it is unknown."
+  },
+  "reference_comparison": {
+    "quantifiable": false,
+    "reason": "no reference views supplied; the adaptation effect is not visible",
+    "views": {},
+    "provenance": {},
+    "matched_days": {},
+    "channels": {},
+    "parameter_source": null,
+    "verified_model_identity": false,
+    "demonstration": null,
+    "note": "A stable adapted baseline is not proof of health. The adapted and frozen indices are standardised by different scales, so their difference is not a quantity; only a baseline location difference in residual units, or on an explicitly named shared scale, is meaningful. A scale-only difference is not contamination evidence."
+  },
+  "observations": [
+    {
+      "id": "OBS1",
+      "kind": "change",
+      "observation": "cycle_duration_s increase of +0.1949 s (+2.23 reference sigma) against its own 21-day reference"
+    },
+    {
+      "id": "OBS2",
+      "kind": "change",
+      "observation": "mean_current_a increase of +0.06602 A (+2.44 reference sigma) against its own 21-day reference"
+    },
+    {
+      "id": "OBS3",
+      "kind": "multi_family",
+      "observation": "channels from 2 physically distinct families shifted together: motor_current, timing"
+    },
+    {
+      "id": "OBS4",
+      "kind": "wear_consistent",
+      "observation": "every shift is in the direction the contract associates with wear for that channel"
+    },
+    {
+      "id": "OBS5",
+      "kind": "peer_not_shared",
+      "observation": "9 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+    },
+    {
+      "id": "OBS6",
+      "kind": "peer_not_shared",
+      "observation": "9 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+    },
+    {
+      "id": "OBS7",
+      "kind": "missing",
+      "observation": "not established: current_integral_as: insufficient supported recent days"
+    },
+    {
+      "id": "OBS8",
+      "kind": "missing",
+      "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+    }
+  ],
+  "missing_evidence": [
+    "current_integral_as: insufficient supported recent days",
+    "reference comparison: no reference views supplied; the adaptation effect is not visible"
+  ],
+  "explanations": [
+    {
+      "explanation": "sensor_or_measurement_change_on_this_door",
+      "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change. 1 channel(s) were not observed, so they neither support nor contradict this.",
+      "supported_by": [
+        "OBS5",
+        "OBS6"
+      ],
+      "contradicted_by": [],
+      "suggested_inspection_evidence": [
+        "Independent re-measurement of the affected channel on a few cycles",
+        "Records of any door control unit, sensor, wiring or firmware change since the reference window",
+        "Whether the same channel on the opposite leaf or paired door shows the shift"
+      ]
+    },
+    {
+      "explanation": "mechanical_change_on_this_door",
+      "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. 1 channel(s) were not observed, so they neither support nor contradict this. Comparable peers did not show the change in: cycle_duration_s, mean_current_a.",
+      "supported_by": [
+        "OBS3",
+        "OBS4",
+        "OBS5",
+        "OBS6"
+      ],
+      "contradicted_by": [],
+      "suggested_inspection_evidence": [
+        "Recorded observations of movement quality on a sample of cycles",
+        "Maintenance and parts history for this door since the reference window",
+        "Whether the affected channels continue to move together over the next few days"
+      ]
+    },
+    {
+      "explanation": "common_influence_across_doors",
+      "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+      "supported_by": [],
+      "contradicted_by": [
+        "OBS5",
+        "OBS6"
+      ],
+      "suggested_inspection_evidence": [
+        "Whether the shift starts on the same date across the comparable peers",
+        "Timetable, duty roster or service pattern changes covering the same dates",
+        "Fleet-wide software, calibration or configuration change records"
+      ]
+    },
+    {
+      "explanation": "reference_contamination",
+      "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+      "supported_by": [],
+      "contradicted_by": [],
+      "suggested_inspection_evidence": [
+        "Inspection or maintenance evidence covering the reference window itself",
+        "The frozen fleet baseline parameters for the same asset-days, alongside the adapted ones",
+        "Any commissioning or post-overhaul record explaining a persistent offset"
+      ]
+    },
+    {
+      "explanation": "cannot_distinguish",
+      "statement": "The available observations do not separate the explanations above.",
+      "supported_by": [
+        "OBS7",
+        "OBS8"
+      ],
+      "contradicted_by": [],
+      "suggested_inspection_evidence": [
+        "The evidence named under 'missing_evidence' for this assessment",
+        "Continued observation until the unknown channels become supported"
+      ]
+    }
+  ],
+  "explanation_order": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+  "inspection_suggestions_status": "illustrative, pending operator review",
+  "safeguards": {
+    "identifies_root_cause": false,
+    "suppresses_alerts": false,
+    "reduces_urgency": false,
+    "authorises_deferral": false,
+    "release_to_service": false,
+    "changes_detector_or_thresholds": false,
+    "prescribes_maintenance_procedure": false
+  },
+  "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+  "evidence_hash": "2502834b756e123a37dacbda3b72a703c12952552ac28c1d062b9213bffddf07"
+}

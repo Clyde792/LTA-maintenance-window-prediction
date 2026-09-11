@@ -60,7 +60,7 @@ def run_fleet(cycles, episodes, name, outdir):
         pipe = HealthPipeline().fit(training[training.ts < ref_end])
         train_daily = pipe.transform(training)
         base_daily = pipe.transform(target)
-        adapted = onboard(pipe, target[target.ts < onboard_end], as_of=onboard_end,
+        adapted = onboard(pipe, target[target.ts < onboard_end], experimental=True,as_of=onboard_end,
                           reference_days=REFERENCE_DAYS)
         adapted_daily = adapted.transform(target)
         enrollment.append({"group":group,"accepted":sorted(adapted.ready_at),"rejected":adapted.rejected})

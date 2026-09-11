@@ -1,0 +1,50 @@
+{
+  "policy": {
+    "min_observations": 3,
+    "max_age_days": 5.0,
+    "max_gap_days": 3.0
+  },
+  "policy_label": "m3_a5_g3",
+  "selected_on_seeds": [
+    20260913,
+    20260914
+  ],
+  "qualifying_candidates": [
+    "m2_a5_g2",
+    "m2_a5_g3",
+    "m2_a5_g4",
+    "m3_a5_g2",
+    "m3_a5_g3",
+    "m3_a5_g4"
+  ],
+  "tie_break": [
+    "outage availability on affected assets (max)",
+    "min_observations (max)",
+    "max_age_days (min)",
+    "max_gap_days (min)"
+  ],
+  "development_checks": {
+    "outage_availability_affected": {
+      "value": 0.6574074074074076,
+      "pass": true
+    },
+    "clean_availability_regression": {
+      "value": -0.02546296296296302,
+      "pass": true
+    },
+    "clean_detection_regression": {
+      "value": 0.0,
+      "pass": true
+    },
+    "clean_unmatched_increase": {
+      "value": 0.05787037037037039,
+      "pass": true
+    },
+    "recovery_not_slower": {
+      "value": 0.0,
+      "pass": true
+    }
+  },
+  "frozen_at": "2026-09-11T03:53:59.732890+08:00",
+  "note": "Frozen from the development seeds. The evaluation seeds had not been scored when this was written."
+}

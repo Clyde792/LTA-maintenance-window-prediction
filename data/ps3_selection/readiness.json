@@ -1,0 +1,42 @@
+{
+  "subsystem": "door",
+  "telemetry_rows": 456840,
+  "observed_days": 120,
+  "missing_columns": [],
+  "nonfinite_fraction": {
+    "cycle_duration_s": 0.0,
+    "peak_current_a": 0.0,
+    "mean_current_a": 0.0,
+    "current_integral_as": 0.0,
+    "travel_mm": 0.0,
+    "obstruction_flag": 0.0,
+    "retry_count": 0.0,
+    "ambient_temp_c": 0.0,
+    "load_proxy": 0.0,
+    "hour_of_day": 0.0
+  },
+  "invalid_timestamps": 0,
+  "duplicate_asset_timestamps": 20,
+  "current_pipeline": {
+    "ready_for_reviewed_trial": false,
+    "blockers": [
+      "source units and conversions need review",
+      "telemetry-to-asset identities need review",
+      "duplicate asset timestamps require cycle/event identity resolution"
+    ]
+  },
+  "labelled_evaluation": {
+    "ready_for_reviewed_trial": false,
+    "fault_groups": 9,
+    "blockers": [
+      "fault meaning, confirmation time and annotation coverage need review"
+    ]
+  },
+  "warnings": [],
+  "limitations": [
+    "Passing is not evidence that the reference is healthy or the model is applicable.",
+    "Current thresholds, context assumptions and cycle aggregation must be reviewed against the supplied schema.",
+    "No labels means no supervised accuracy, warning-time or RUL validation claim.",
+    "Bogie contract availability is not a demonstrated bogie detector."
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "run_id": "dev-20260911T040628-2aabf349",
+  "policy": {
+    "min_observations": 3,
+    "max_age_days": 5.0,
+    "max_gap_days": 3.0
+  },
+  "policy_label": "m3_a5_g3",
+  "selected_on_seeds": [
+    20260913,
+    20260914
+  ],
+  "qualifying_candidates": [
+    "m2_a5_g2",
+    "m2_a5_g3",
+    "m2_a5_g4",
+    "m3_a5_g2",
+    "m3_a5_g3",
+    "m3_a5_g4"
+  ],
+  "tie_break": [
+    "outage availability on affected assets (max)",
+    "min_observations (max)",
+    "max_age_days (min)",
+    "max_gap_days (min)"
+  ],
+  "development_checks": {
+    "outage_availability_affected": {
+      "value": 0.6574074074074076,
+      "pass": true
+    },
+    "clean_availability_regression": {
+      "value": -0.02546296296296302,
+      "pass": true
+    },
+    "clean_detection_regression": {
+      "value": 0.0,
+      "pass": true
+    },
+    "clean_unmatched_increase": {
+      "value": 0.05787037037037039,
+      "pass": true
+    },
+    "recovery_coverage": {
+      "value": 0.0,
+      "pass": true
+    },
+    "recovery_not_slower": {
+      "value": 0.0,
+      "pass": true
+    }
+  },
+  "protocol.json_sha256": "b4c44456f214e8dcd7bb6dba8cc7fd43b779459f426a873aca4ca1af14f3fab8",
+  "protocol_canonical_sha256": "2aabf3492d0209036320b7243a827cca6224c1ce02ce941b3b9b0bbe7e4259ed",
+  "dev_results.json_sha256": "ed3d1d3a0105697466835814c5c07b17aea21384ebe63a52d6b171aefcaf6b37",
+  "code": {
+    "experiment_script": "99aafa82c75519b4aef0fc0611676ff18fae1faa4ae7fe81219cdee8212abb81",
+    "detector_module": "1c495eeba1046f50c3d29026b55e792f6c3b77948d887d9476e41984add5a344",
+    "baseline_module": "30cb851c4da3901c394f726a455064a99c223dfd285781b3c51ec7f7c17a16bc",
+    "metrics_module": "bdd41a7faa899562ffc9d3ef4cf67f9b8aed8f5dc874f25e990c2e178195b075"
+  },
+  "frozen_at": "2026-09-11T04:10:04.939851+08:00",
+  "note": "CORRECTED 2026-09-11. This freeze was written by a regeneration of an earlier run, after the evaluation seeds (20260915, 20260916) had already been scored under the previous code. The original text claimed those seeds were still unscored; that claim was inherited from the first run and is withdrawn. The policy was re-selected from the development seeds alone and independently reproduced the earlier choice, but the evaluation that follows it is a REPRODUCTION on exposed seeds, not a blind test.",
+  "blinding": "not blind: reproduction on previously exposed evaluation seeds",
+  "supersedes": "the original flat run in data/outage_experiment/, preserved and marked SUPERSEDED.md"
+}

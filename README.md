@@ -46,6 +46,7 @@ From this directory, using the existing virtual environment:
 .\.venv\Scripts\python.exe -B scripts/build_aspects.py
 .\.venv\Scripts\python.exe -B scripts/build_duty.py
 .\.venv\Scripts\python.exe -B scripts/build_deferral.py
+.\.venv\Scripts\python.exe -B scripts/build_verification.py --seed-demo
 .\.venv\Scripts\python.exe -B scripts/build_ui.py
 .\.venv\Scripts\python.exe -B scripts/validate_pipeline.py
 .\.venv\Scripts\python.exe -B scripts/run_tournament.py

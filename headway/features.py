@@ -42,6 +42,20 @@ from . import contract
 # Suffix-based so a new subsystem needs no edit here.
 RATE_SUFFIXES = ("_flag", "_count")
 
+# The daily quality contract, in one place. Downstream code that needs to reason
+# about a SINGLE channel must not re-derive these: `data_quality_ok` folds the
+# cross-channel completeness minimum together with the channel-agnostic terms,
+# so one degraded channel voids the whole day. `quality_ready` carries exactly
+# the channel-agnostic part, and the invariant downstream may rely on is
+#
+#     data_quality_ok == quality_ready & (min over ALL channels' completeness >= MIN_COMPLETENESS)
+#
+# Anything that widens `data_quality_ok` must widen `quality_ready` in step, or
+# the invariant breaks and consumers fall back to the global flag.
+MIN_COMPLETENESS = 0.9
+MIN_CYCLES = 5
+READINESS_FLAG = "quality_ready"
+
 
 def _is_rate(col: str) -> bool:
     return col.endswith(RATE_SUFFIXES)
@@ -112,7 +126,8 @@ def to_daily(
         )
     daily["available_at"] = daily.day + pd.Timedelta(days=1)
     completeness = [f"{c}_completeness" for c in levels]
-    daily["data_quality_ok"] = (daily[completeness].min(axis=1) >= .9) & (daily.n_cycles >= 5)
+    daily[READINESS_FLAG] = daily.n_cycles >= MIN_CYCLES
+    daily["data_quality_ok"] = (daily[completeness].min(axis=1) >= MIN_COMPLETENESS) & daily.quality_ready
     return daily
 
 

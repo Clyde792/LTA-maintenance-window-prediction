@@ -1,0 +1,13 @@
+{
+  "reference_end": "2026-05-01 00:00:00",
+  "calibration_end": "2026-05-31 00:00:00",
+  "validation_end": "2026-06-24 00:00:00",
+  "test_end": "2026-07-30 00:00:00",
+  "data": "synthetic development evidence; previously inspected simulator family",
+  "input_hashes": {
+    "door_cycles.parquet": "1889766bb9643132a4dff9e8ecafbf8f4162ba1760862c39ef53f3b967f6b980",
+    "door_episodes.csv": "f4b95100027f9c52110fe672ab0e8043bbb3fc529dec1304237f0ebc7dc6a813"
+  },
+  "script_hash": "108915cf4c806d907f2d099d4b51f8b771c9efab68845a941b04c40f970fc1b3",
+  "no_automatic_promotion": true
+}

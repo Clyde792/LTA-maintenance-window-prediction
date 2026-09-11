@@ -80,6 +80,10 @@ class HealthPipeline:
         d["uni_index"]=d[f"{contract.get(self.subsystem).primary}_hx"]
         d=features.add_trend(d)
         d=features.add_trend(d,col="uni_index")
-        d["data_quality_ok"] &= d.health_inputs_complete & (d.available_at>=self.fitted_at)
+        # Both flags take the same channel-agnostic terms, preserving
+        # features.to_daily's invariant between them.
+        ready = d.health_inputs_complete & (d.available_at>=self.fitted_at)
+        d["quality_ready"] &= ready
+        d["data_quality_ok"] &= ready
         d["preprocessing_fitted_at"]=self.fitted_at
         return d

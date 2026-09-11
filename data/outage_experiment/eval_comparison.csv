@@ -1,0 +1,145 @@
+seed,scenario,method,policy,population,detector,expected_asset_days,supported_fraction_of_expected,mechanical_episodes,episodes_detected,median_lead_d,worst_lead_d,alerts_total,alerts_matched_mechanical,alerts_unmatched,unmatched_per_asset_month,unmatched_attribution,recovery,threshold
+20260915,clean,baseline,,whole_fleet,raw,864,0.9861111111111112,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,5.094745096801005
+20260915,clean,baseline,,whole_fleet,directional,864,0.9861111111111112,3,0,,0.0,3,0,3,0.10416666666666666,not attributed,,35.03418600090101
+20260915,clean,baseline,,whole_fleet,mahalanobis,864,0.9861111111111112,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,1715.1076888518396
+20260915,clean,baseline,,affected_assets,raw,216,0.9861111111111112,0,0,,,1,0,1,0.1388888888888889,not attributed,,5.094745096801005
+20260915,clean,baseline,,affected_assets,directional,216,0.9861111111111112,0,0,,,1,0,1,0.1388888888888889,not attributed,,35.03418600090101
+20260915,clean,baseline,,affected_assets,mahalanobis,216,0.9861111111111112,0,0,,,1,0,1,0.1388888888888889,not attributed,,1715.1076888518396
+20260915,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9953703703703703,3,0,,0.0,3,0,3,0.10416666666666666,not attributed,,4.96102482550558
+20260915,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9953703703703703,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,33.46555914719268
+20260915,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9953703703703703,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,1406.6080966315287
+20260915,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.9953703703703703,0,0,,,1,0,1,0.1388888888888889,not attributed,,4.96102482550558
+20260915,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.9953703703703703,0,0,,,1,0,1,0.1388888888888889,not attributed,,33.46555914719268
+20260915,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.9953703703703703,0,0,,,1,0,1,0.1388888888888889,not attributed,,1406.6080966315287
+20260915,missing_channel,baseline,,whole_fleet,raw,864,0.7395833333333334,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,5.094745096801005
+20260915,missing_channel,baseline,,whole_fleet,directional,864,0.7395833333333334,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,35.03418600090101
+20260915,missing_channel,baseline,,whole_fleet,mahalanobis,864,0.7395833333333334,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,1715.1076888518396
+20260915,missing_channel,baseline,,affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.094745096801005
+20260915,missing_channel,baseline,,affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,35.03418600090101
+20260915,missing_channel,baseline,,affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1715.1076888518396
+20260915,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.7465277777777778,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,4.96102482550558
+20260915,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.7465277777777778,3,0,,0.0,0,0,0,0.0,not attributed,,33.46555914719268
+20260915,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.7465277777777778,3,0,,0.0,0,0,0,0.0,not attributed,,1406.6080966315287
+20260915,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,4.96102482550558
+20260915,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,33.46555914719268
+20260915,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1406.6080966315287
+20260915,missing_days,baseline,,whole_fleet,raw,864,0.7395833333333334,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,5.094745096801005
+20260915,missing_days,baseline,,whole_fleet,directional,864,0.7395833333333334,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,35.03418600090101
+20260915,missing_days,baseline,,whole_fleet,mahalanobis,864,0.7395833333333334,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,1715.1076888518396
+20260915,missing_days,baseline,,affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.094745096801005
+20260915,missing_days,baseline,,affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,35.03418600090101
+20260915,missing_days,baseline,,affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1715.1076888518396
+20260915,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9120370370370371,3,0,,0.0,3,0,3,0.10416666666666666,not attributed,,4.96102482550558
+20260915,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9120370370370371,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,33.46555914719268
+20260915,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9120370370370371,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,1406.6080966315287
+20260915,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.6620370370370371,0,0,,,1,0,1,0.1388888888888889,not attributed,,4.96102482550558
+20260915,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.6620370370370371,0,0,,,1,0,1,0.1388888888888889,not attributed,,33.46555914719268
+20260915,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.6620370370370371,0,0,,,1,0,1,0.1388888888888889,not attributed,,1406.6080966315287
+20260915,blackout,baseline,,whole_fleet,raw,864,0.9027777777777778,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,5.094745096801005
+20260915,blackout,baseline,,whole_fleet,directional,864,0.9027777777777778,3,0,,0.0,3,0,3,0.10416666666666666,not attributed,,35.03418600090101
+20260915,blackout,baseline,,whole_fleet,mahalanobis,864,0.9027777777777778,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,1715.1076888518396
+20260915,blackout,baseline,,affected_assets,raw,216,0.6527777777777778,0,0,,,1,0,1,0.1388888888888889,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",5.094745096801005
+20260915,blackout,baseline,,affected_assets,directional,216,0.6527777777777778,0,0,,,1,0,1,0.1388888888888889,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",35.03418600090101
+20260915,blackout,baseline,,affected_assets,mahalanobis,216,0.6527777777777778,0,0,,,1,0,1,0.1388888888888889,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",1715.1076888518396
+20260915,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9120370370370371,3,0,,0.0,3,0,3,0.10416666666666666,not attributed,,4.96102482550558
+20260915,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9120370370370371,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,33.46555914719268
+20260915,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9120370370370371,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,1406.6080966315287
+20260915,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.6620370370370371,0,0,,,1,0,1,0.1388888888888889,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",4.96102482550558
+20260915,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.6620370370370371,0,0,,,1,0,1,0.1388888888888889,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",33.46555914719268
+20260915,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.6620370370370371,0,0,,,1,0,1,0.1388888888888889,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",1406.6080966315287
+20260915,sensor_offset,baseline,,whole_fleet,raw,864,0.9861111111111112,3,0,,0.0,12,0,12,0.41666666666666663,sensor perturbation injected on the affected assets,,5.094745096801005
+20260915,sensor_offset,baseline,,whole_fleet,directional,864,0.9861111111111112,3,0,,0.0,3,0,3,0.10416666666666666,sensor perturbation injected on the affected assets,,35.03418600090101
+20260915,sensor_offset,baseline,,whole_fleet,mahalanobis,864,0.9861111111111112,3,0,,0.0,3,0,3,0.10416666666666666,sensor perturbation injected on the affected assets,,1715.1076888518396
+20260915,sensor_offset,baseline,,affected_assets,raw,216,0.9861111111111112,0,0,,,11,0,11,1.5277777777777777,sensor perturbation injected on the affected assets,,5.094745096801005
+20260915,sensor_offset,baseline,,affected_assets,directional,216,0.9861111111111112,0,0,,,1,0,1,0.1388888888888889,sensor perturbation injected on the affected assets,,35.03418600090101
+20260915,sensor_offset,baseline,,affected_assets,mahalanobis,216,0.9861111111111112,0,0,,,2,0,2,0.2777777777777778,sensor perturbation injected on the affected assets,,1715.1076888518396
+20260915,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9953703703703703,3,0,,0.0,38,0,38,1.3194444444444444,sensor perturbation injected on the affected assets,,4.96102482550558
+20260915,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9953703703703703,3,0,,0.0,2,0,2,0.06944444444444445,sensor perturbation injected on the affected assets,,33.46555914719268
+20260915,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9953703703703703,3,0,,0.0,8,0,8,0.2777777777777778,sensor perturbation injected on the affected assets,,1406.6080966315287
+20260915,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.9953703703703703,0,0,,,36,0,36,5.0,sensor perturbation injected on the affected assets,,4.96102482550558
+20260915,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.9953703703703703,0,0,,,2,0,2,0.2777777777777778,sensor perturbation injected on the affected assets,,33.46555914719268
+20260915,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.9953703703703703,0,0,,,8,0,8,1.1111111111111112,sensor perturbation injected on the affected assets,,1406.6080966315287
+20260915,unsupported_context,baseline,,whole_fleet,raw,864,0.7395833333333334,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,5.094745096801005
+20260915,unsupported_context,baseline,,whole_fleet,directional,864,0.7395833333333334,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,35.03418600090101
+20260915,unsupported_context,baseline,,whole_fleet,mahalanobis,864,0.7395833333333334,3,0,,0.0,1,0,1,0.034722222222222224,not attributed,,1715.1076888518396
+20260915,unsupported_context,baseline,,affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.094745096801005
+20260915,unsupported_context,baseline,,affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,35.03418600090101
+20260915,unsupported_context,baseline,,affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1715.1076888518396
+20260915,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.7465277777777778,3,0,,0.0,2,0,2,0.06944444444444445,not attributed,,4.96102482550558
+20260915,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.7465277777777778,3,0,,0.0,0,0,0,0.0,not attributed,,33.46555914719268
+20260915,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.7465277777777778,3,0,,0.0,0,0,0,0.0,not attributed,,1406.6080966315287
+20260915,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,4.96102482550558
+20260915,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,33.46555914719268
+20260915,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1406.6080966315287
+20260916,clean,baseline,,whole_fleet,raw,864,0.9849537037037037,3,1,2.8623034169675923,0.0,3,1,2,0.06944444444444445,not attributed,,5.12787212040028
+20260916,clean,baseline,,whole_fleet,directional,864,0.9849537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,36.89738814810585
+20260916,clean,baseline,,whole_fleet,mahalanobis,864,0.9849537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,1719.793662083541
+20260916,clean,baseline,,affected_assets,raw,216,1.0,0,0,,,0,0,0,0.0,not attributed,,5.12787212040028
+20260916,clean,baseline,,affected_assets,directional,216,1.0,0,0,,,0,0,0,0.0,not attributed,,36.89738814810585
+20260916,clean,baseline,,affected_assets,mahalanobis,216,1.0,0,0,,,0,0,0,0.0,not attributed,,1719.793662083541
+20260916,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9942129629629629,3,1,1.8623034169675925,0.0,3,1,2,0.06944444444444445,not attributed,,5.098515702952582
+20260916,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9942129629629629,3,3,0.8886448698263889,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,33.470104042203396
+20260916,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9942129629629629,3,2,2.375474143396991,0.0,6,3,3,0.10416666666666666,not attributed,,1472.723149324283
+20260916,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,1.0,0,0,,,0,0,0,0.0,not attributed,,5.098515702952582
+20260916,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,1.0,0,0,,,0,0,0,0.0,not attributed,,33.470104042203396
+20260916,clean,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,1.0,0,0,,,0,0,0,0.0,not attributed,,1472.723149324283
+20260916,missing_channel,baseline,,whole_fleet,raw,864,0.7349537037037037,3,1,2.8623034169675923,0.0,3,1,2,0.06944444444444445,not attributed,,5.12787212040028
+20260916,missing_channel,baseline,,whole_fleet,directional,864,0.7349537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,36.89738814810585
+20260916,missing_channel,baseline,,whole_fleet,mahalanobis,864,0.7349537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,1719.793662083541
+20260916,missing_channel,baseline,,affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.12787212040028
+20260916,missing_channel,baseline,,affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,36.89738814810585
+20260916,missing_channel,baseline,,affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1719.793662083541
+20260916,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.7442129629629629,3,1,1.8623034169675925,0.0,3,1,2,0.06944444444444445,not attributed,,5.098515702952582
+20260916,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.7442129629629629,3,3,0.8886448698263889,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,33.470104042203396
+20260916,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.7442129629629629,3,2,2.375474143396991,0.0,6,3,3,0.10416666666666666,not attributed,,1472.723149324283
+20260916,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.098515702952582
+20260916,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,33.470104042203396
+20260916,missing_channel,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1472.723149324283
+20260916,missing_days,baseline,,whole_fleet,raw,864,0.7349537037037037,3,1,2.8623034169675923,0.0,3,1,2,0.06944444444444445,not attributed,,5.12787212040028
+20260916,missing_days,baseline,,whole_fleet,directional,864,0.7349537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,36.89738814810585
+20260916,missing_days,baseline,,whole_fleet,mahalanobis,864,0.7349537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,1719.793662083541
+20260916,missing_days,baseline,,affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.12787212040028
+20260916,missing_days,baseline,,affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,36.89738814810585
+20260916,missing_days,baseline,,affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1719.793662083541
+20260916,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9108796296296297,3,1,1.8623034169675925,0.0,3,1,2,0.06944444444444445,not attributed,,5.098515702952582
+20260916,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9108796296296297,3,3,0.8886448698263889,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,33.470104042203396
+20260916,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9108796296296297,3,2,2.375474143396991,0.0,6,3,3,0.10416666666666666,not attributed,,1472.723149324283
+20260916,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,,5.098515702952582
+20260916,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,,33.470104042203396
+20260916,missing_days,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,,1472.723149324283
+20260916,blackout,baseline,,whole_fleet,raw,864,0.9016203703703703,3,1,2.8623034169675923,0.0,3,1,2,0.06944444444444445,not attributed,,5.12787212040028
+20260916,blackout,baseline,,whole_fleet,directional,864,0.9016203703703703,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,36.89738814810585
+20260916,blackout,baseline,,whole_fleet,mahalanobis,864,0.9016203703703703,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,1719.793662083541
+20260916,blackout,baseline,,affected_assets,raw,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",5.12787212040028
+20260916,blackout,baseline,,affected_assets,directional,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",36.89738814810585
+20260916,blackout,baseline,,affected_assets,mahalanobis,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",1719.793662083541
+20260916,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9108796296296297,3,1,1.8623034169675925,0.0,3,1,2,0.06944444444444445,not attributed,,5.098515702952582
+20260916,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9108796296296297,3,3,0.8886448698263889,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,33.470104042203396
+20260916,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9108796296296297,3,2,2.375474143396991,0.0,6,3,3,0.10416666666666666,not attributed,,1472.723149324283
+20260916,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",5.098515702952582
+20260916,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",33.470104042203396
+20260916,blackout,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.6666666666666666,0,0,,,0,0,0,0.0,not attributed,"{'median_days': 2.0, 'assets_recovered': 6, 'assets_total': 6}",1472.723149324283
+20260916,sensor_offset,baseline,,whole_fleet,raw,864,0.9849537037037037,3,1,2.8623034169675923,0.0,3,1,2,0.06944444444444445,sensor perturbation injected on the affected assets,,5.12787212040028
+20260916,sensor_offset,baseline,,whole_fleet,directional,864,0.9849537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,sensor perturbation injected on the affected assets,,36.89738814810585
+20260916,sensor_offset,baseline,,whole_fleet,mahalanobis,864,0.9849537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,sensor perturbation injected on the affected assets,,1719.793662083541
+20260916,sensor_offset,baseline,,affected_assets,raw,216,1.0,0,0,,,0,0,0,0.0,sensor perturbation injected on the affected assets,,5.12787212040028
+20260916,sensor_offset,baseline,,affected_assets,directional,216,1.0,0,0,,,0,0,0,0.0,sensor perturbation injected on the affected assets,,36.89738814810585
+20260916,sensor_offset,baseline,,affected_assets,mahalanobis,216,1.0,0,0,,,0,0,0,0.0,sensor perturbation injected on the affected assets,,1719.793662083541
+20260916,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.9942129629629629,3,1,1.8623034169675925,0.0,3,1,2,0.06944444444444445,sensor perturbation injected on the affected assets,,5.098515702952582
+20260916,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.9942129629629629,3,3,0.8886448698263889,0.2836155941319444,6,4,2,0.06944444444444445,sensor perturbation injected on the affected assets,,33.470104042203396
+20260916,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.9942129629629629,3,2,2.375474143396991,0.0,6,3,3,0.10416666666666666,sensor perturbation injected on the affected assets,,1472.723149324283
+20260916,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,1.0,0,0,,,0,0,0,0.0,sensor perturbation injected on the affected assets,,5.098515702952582
+20260916,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,1.0,0,0,,,0,0,0,0.0,sensor perturbation injected on the affected assets,,33.470104042203396
+20260916,sensor_offset,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,1.0,0,0,,,0,0,0,0.0,sensor perturbation injected on the affected assets,,1472.723149324283
+20260916,unsupported_context,baseline,,whole_fleet,raw,864,0.7349537037037037,3,1,2.8623034169675923,0.0,3,1,2,0.06944444444444445,not attributed,,5.12787212040028
+20260916,unsupported_context,baseline,,whole_fleet,directional,864,0.7349537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,36.89738814810585
+20260916,unsupported_context,baseline,,whole_fleet,mahalanobis,864,0.7349537037037037,3,3,1.888644869826389,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,1719.793662083541
+20260916,unsupported_context,baseline,,affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.12787212040028
+20260916,unsupported_context,baseline,,affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,36.89738814810585
+20260916,unsupported_context,baseline,,affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1719.793662083541
+20260916,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,raw,864,0.7442129629629629,3,1,1.8623034169675925,0.0,3,1,2,0.06944444444444445,not attributed,,5.098515702952582
+20260916,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,directional,864,0.7442129629629629,3,3,0.8886448698263889,0.2836155941319444,6,4,2,0.06944444444444445,not attributed,,33.470104042203396
+20260916,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",whole_fleet,mahalanobis,864,0.7442129629629629,3,2,2.375474143396991,0.0,6,3,3,0.10416666666666666,not attributed,,1472.723149324283
+20260916,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,raw,216,0.0,0,0,,,0,0,0,0.0,not attributed,,5.098515702952582
+20260916,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,directional,216,0.0,0,0,,,0,0,0,0.0,not attributed,,33.470104042203396
+20260916,unsupported_context,frozen,"{'min_observations': 3, 'max_age_days': 5.0, 'max_gap_days': 3.0}",affected_assets,mahalanobis,216,0.0,0,0,,,0,0,0,0.0,not attributed,,1472.723149324283

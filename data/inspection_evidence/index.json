@@ -1,0 +1,752 @@
+{
+  "seed": 20260911,
+  "purpose": "Illustrative examples of the experimental inspection-evidence module.",
+  "warning": "Fixtures constructed to exercise the module's own rules. They show output shape and abstention behaviour, not diagnostic accuracy. The injected effect is recorded here and was never an input to the module.",
+  "explanation_order": "Explanations appear in a fixed order in every record. It is not a ranking, and 'supported_explanations' below is a list of what has any supporting observation at all - not a verdict.",
+  "cases": [
+    {
+      "case": "isolated_sensor_offset",
+      "injected_effect": "sensor offset on current_integral_as only",
+      "expected_reading": "one shifted channel, no independent corroboration, peers unaffected",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "isolated_sensor_offset.json",
+      "evidence_hash": "d4fbf4eaec9c14e51f68070147ea14ff3dea3d89f4c63c37ff1e1bdced97da2e",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [
+          "current_integral_as"
+        ],
+        "independent_families": [],
+        "ambiguous_channels": [
+          "current_integral_as"
+        ],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "sensor_or_measurement_change_on_this_door",
+          "mechanical_change_on_this_door",
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    },
+    {
+      "case": "coherent_multi_channel",
+      "injected_effect": "coherent mechanical change on the target",
+      "expected_reading": "three independent families shift in the wear direction, peers unaffected",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "coherent_multi_channel.json",
+      "evidence_hash": "448e4507f561a89722c3c6ec76c5ee1ce16e91c10f8dd7df5983ab89b1476e61",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "independent_families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "sensor_or_measurement_change_on_this_door",
+          "mechanical_change_on_this_door",
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    },
+    {
+      "case": "shared_peer_shift",
+      "injected_effect": "common influence across the target and its peers",
+      "expected_reading": "peers share the change; sensor and local-mechanical are contradicted",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "shared_peer_shift.json",
+      "evidence_hash": "f478491415c2aa7e32f57ed65bb7d5ff8bce344938272fa704cc61bef4d2730d",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [
+          "mean_current_a",
+          "peak_current_a"
+        ],
+        "independent_families": [
+          "motor_current"
+        ],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [
+          "mean_current_a",
+          "peak_current_a"
+        ],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "sensor_or_measurement_change_on_this_door",
+          "common_influence_across_doors",
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    },
+    {
+      "case": "contaminated_reference",
+      "injected_effect": "offset present from the first reference day",
+      "expected_reading": "no recent change; the two baselines differ in LOCATION by the injected offset in A.s, with the scale ratio at 1",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "contaminated_reference.json",
+      "evidence_hash": "de9ca9a3d3650f9796def1bb58845e71d5e0ce49bfdb92ef2196789f57d0bfbf",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": true,
+        "reference_verified_model_identity": true,
+        "reference_parameter_source": "inferred_from_index",
+        "reference_demonstration": null,
+        "reference_reason": null,
+        "recovered_baselines": {
+          "cycle_duration_s": {
+            "location_offset": 0.008942736048046395,
+            "unit": "s",
+            "location_offset_in_fleet_scale": 0.1788547209609279,
+            "scale_ratio_asset_over_fleet": 0.9999999999999999
+          },
+          "peak_current_a": {
+            "location_offset": -0.0059323410716085375,
+            "unit": "A",
+            "location_offset_in_fleet_scale": -0.07415426339510671,
+            "scale_ratio_asset_over_fleet": 1.0000000000000002
+          },
+          "mean_current_a": {
+            "location_offset": -0.00536133577879651,
+            "unit": "A",
+            "location_offset_in_fleet_scale": -0.10722671557593015,
+            "scale_ratio_asset_over_fleet": 0.9999999999999993
+          },
+          "current_integral_as": {
+            "location_offset": 0.7937862593619797,
+            "unit": "A.s",
+            "location_offset_in_fleet_scale": 7.937862593619797,
+            "scale_ratio_asset_over_fleet": 0.9999999999999996
+          },
+          "travel_mm": {
+            "location_offset": -0.16520806941057303,
+            "unit": "mm",
+            "location_offset_in_fleet_scale": -0.13767339117547744,
+            "scale_ratio_asset_over_fleet": 0.9999999999999992
+          }
+        },
+        "supported_explanations": [
+          "reference_contamination"
+        ],
+        "missing_evidence": []
+      }
+    },
+    {
+      "case": "ambiguous_missing_evidence",
+      "injected_effect": "a sub-threshold move on peak_current_a; four channels unsupported",
+      "expected_reading": "no shift is claimed - the move lands below the shift threshold; the unsupported channels and the thin peer set stay unknown and are carried as missing evidence under cannot_distinguish",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "ambiguous_missing_evidence.json",
+      "evidence_hash": "8c7496521b0d82492272f553f59ed7a51356f5445772561b1a425461f2734fd9",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "travel_mm"
+        ],
+        "peer_comparability": "unknown",
+        "comparable_peers": 2,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "current_integral_as: insufficient supported recent days",
+          "cycle_duration_s: insufficient supported recent days",
+          "mean_current_a: insufficient supported recent days",
+          "travel_mm: insufficient supported recent days",
+          "peer comparison: only 2 comparable peers; 3 required",
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    },
+    {
+      "case": "sensor_and_mechanical_overlap",
+      "injected_effect": "sensor offset on current_integral_as plus a coherent mechanical change",
+      "expected_reading": "multi-family shift and an ambiguous derived channel are both reported",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "sensor_and_mechanical_overlap.json",
+      "evidence_hash": "f54053e5fa88f5599363d186ea63fe1b1a78bc8cc3a57bd887debd55751db9b0",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "independent_families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous_channels": [
+          "current_integral_as"
+        ],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "sensor_or_measurement_change_on_this_door",
+          "mechanical_change_on_this_door",
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    },
+    {
+      "case": "shared_shift_with_local_mechanical",
+      "injected_effect": "fleet-wide current shift plus a target-only timing and travel change",
+      "expected_reading": "peer sharing and local independent families are both reported",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "shared_shift_with_local_mechanical.json",
+      "evidence_hash": "c63636d93ae029cbae9e524c07f1d6ba43f533b3ec48bdfe4a812cc894982d6b",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "independent_families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [
+          "mean_current_a",
+          "peak_current_a"
+        ],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "sensor_or_measurement_change_on_this_door",
+          "mechanical_change_on_this_door",
+          "common_influence_across_doors",
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    },
+    {
+      "case": "quiet_control",
+      "injected_effect": "nothing injected",
+      "expected_reading": "no shifted channels, no explanation supported except cannot_distinguish",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "quiet_control.json",
+      "evidence_hash": "800182ced016650425d267156f45c7432ab99f90a1250925a6cca792ba03619d",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    },
+    {
+      "case": "scale_only_difference",
+      "injected_effect": "adapted scale three times the fleet scale",
+      "expected_reading": "location offset ~0, scale ratio ~3, no contamination observation",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "scale_only_difference.json",
+      "evidence_hash": "330563e2a7f1700aaadabdc16eb619c3a15b75ee105100a3f18bb1affcea45ec",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": true,
+        "reference_verified_model_identity": true,
+        "reference_parameter_source": "inferred_from_index",
+        "reference_demonstration": null,
+        "reference_reason": null,
+        "recovered_baselines": {
+          "cycle_duration_s": {
+            "location_offset": 0.008942736048046398,
+            "unit": "s",
+            "location_offset_in_fleet_scale": 0.17885472096092794,
+            "scale_ratio_asset_over_fleet": 2.9999999999999996
+          },
+          "peak_current_a": {
+            "location_offset": -0.005932341071608546,
+            "unit": "A",
+            "location_offset_in_fleet_scale": -0.0741542633951068,
+            "scale_ratio_asset_over_fleet": 2.9999999999999987
+          },
+          "mean_current_a": {
+            "location_offset": -0.005361335778796515,
+            "unit": "A",
+            "location_offset_in_fleet_scale": -0.10722671557593025,
+            "scale_ratio_asset_over_fleet": 2.999999999999998
+          },
+          "current_integral_as": {
+            "location_offset": -0.006213740638020958,
+            "unit": "A.s",
+            "location_offset_in_fleet_scale": -0.06213740638020959,
+            "scale_ratio_asset_over_fleet": 3.0000000000000013
+          },
+          "travel_mm": {
+            "location_offset": -0.1652080694105731,
+            "unit": "mm",
+            "location_offset_in_fleet_scale": -0.1376733911754775,
+            "scale_ratio_asset_over_fleet": 2.9999999999999982
+          }
+        },
+        "supported_explanations": [],
+        "missing_evidence": []
+      }
+    },
+    {
+      "case": "views_cover_different_dates",
+      "injected_effect": "frozen view on the first ten days, adapted view on the last twenty-five",
+      "expected_reading": "no matched asset-days; the adaptation effect is not quantifiable",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "views_cover_different_dates.json",
+      "evidence_hash": "e64240e79ddd592b8a49281b9c3b943b0e9df7ef01b85ff43b54f6cad4f6bbfd",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "the views share only 0 asset-days; 5 required to compare like with like",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: the views share only 0 asset-days; 5 required to compare like with like"
+        ]
+      }
+    },
+    {
+      "case": "incompatible_reference_provenance",
+      "injected_effect": "the two views were produced under different preprocessing",
+      "expected_reading": "provenance mismatch refuses the comparison before any arithmetic",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "incompatible_reference_provenance.json",
+      "evidence_hash": "301fe1d509d1e28b7bf703c96b490cfbc10ab8015c7619b192373a2d378f05bf",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "the views carry a different preprocessing_fitted_at ('2026-08-01T00:00:00' vs '2026-08-02T00:00:00')",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: the views carry a different preprocessing_fitted_at ('2026-08-01T00:00:00' vs '2026-08-02T00:00:00')"
+        ]
+      }
+    },
+    {
+      "case": "unidentified_reference_model",
+      "injected_effect": "a real offset, but neither view names its normalisation model",
+      "expected_reading": "the operational effect is not quantified; the algebra is recorded only as an explicitly unverified demonstration",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "unidentified_reference_model.json",
+      "evidence_hash": "1af73d9982b0ab0701ce902d332f77c44d295ddca25abf7e23d2ccac4295813a",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": "unverified_algebraic_demonstration",
+        "reference_reason": "asset_reference: no frozen condition-normalisation model identifier (looked for normalisation_model_id, model_version, or a caller-supplied reference_model_versions entry); fleet_reference: no frozen condition-normalisation model identifier (looked for normalisation_model_id, model_version, or a caller-supplied reference_model_versions entry)",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: asset_reference: no frozen condition-normalisation model identifier (looked for normalisation_model_id, model_version, or a caller-supplied reference_model_versions entry); fleet_reference: no frozen condition-normalisation model identifier (looked for normalisation_model_id, model_version, or a caller-supplied reference_model_versions entry)"
+        ]
+      }
+    },
+    {
+      "case": "negated_indices",
+      "injected_effect": "both views' indices multiplied by -1",
+      "expected_reading": "non-positive recovered scale is rejected, not reinterpreted",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "negated_indices.json",
+      "evidence_hash": "e1001b69b71b40e416af6c33b77a3c7b7f398ed29cbf50e47fe1d16650b42716",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": true,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no channel could be quantified: current_integral_as: asset_reference: inferred_from_index scale is -0.1: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.1: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; cycle_duration_s: asset_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; mean_current_a: asset_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; peak_current_a: asset_reference: inferred_from_index scale is -0.08: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.08: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; travel_mm: asset_reference: inferred_from_index scale is -1.2: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -1.2: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no channel could be quantified: current_integral_as: asset_reference: inferred_from_index scale is -0.1: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.1: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; cycle_duration_s: asset_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; mean_current_a: asset_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; peak_current_a: asset_reference: inferred_from_index scale is -0.08: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.08: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; travel_mm: asset_reference: inferred_from_index scale is -1.2: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -1.2: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.",
+          "reference comparison for current_integral_as: asset_reference: inferred_from_index scale is -0.1: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.1: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.",
+          "reference comparison for cycle_duration_s: asset_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.",
+          "reference comparison for mean_current_a: asset_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.05: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.",
+          "reference comparison for peak_current_a: asset_reference: inferred_from_index scale is -0.08: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -0.08: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.",
+          "reference comparison for travel_mm: asset_reference: inferred_from_index scale is -1.2: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention.; fleet_reference: inferred_from_index scale is -1.2: a baseline scale must be finite and strictly positive. A non-positive scale is rejected, not reinterpreted as a different orientation convention."
+        ]
+      }
+    },
+    {
+      "case": "all_reference_rows_unsupported",
+      "injected_effect": "every reference row marked unsupported in both views",
+      "expected_reading": "admission gate finds no usable observation; nothing is quantified",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "all_reference_rows_unsupported.json",
+      "evidence_hash": "b078961887776ce1c5c99d0c99443fa42f87701e0dca570ceaa97580173c8d75",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": true,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no channel could be quantified: current_integral_as: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; cycle_duration_s: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; mean_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; peak_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; travel_mm: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no channel could be quantified: current_integral_as: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; cycle_duration_s: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; mean_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; peak_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; travel_mm: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for current_integral_as: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for cycle_duration_s: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for mean_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for peak_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for travel_mm: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required"
+        ]
+      }
+    },
+    {
+      "case": "disjoint_supported_days",
+      "injected_effect": "alternate days supported in each view, with no day supported in both",
+      "expected_reading": "matched calendar days are not matched SUPPORTED days; nothing is quantified",
+      "asset_id": "TRN100-DOOR-1",
+      "as_of": "2026-09-10T16:00:00+00:00",
+      "record": "disjoint_supported_days.json",
+      "evidence_hash": "b078961887776ce1c5c99d0c99443fa42f87701e0dca570ceaa97580173c8d75",
+      "summary": {
+        "quality_basis": "global_data_quality_ok",
+        "shifted_channels": [],
+        "independent_families": [],
+        "ambiguous_channels": [],
+        "unknown_channels": [],
+        "peer_comparability": "resolved",
+        "comparable_peers": 5,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": true,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no channel could be quantified: current_integral_as: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; cycle_duration_s: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; mean_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; peak_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; travel_mm: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "reference comparison: no channel could be quantified: current_integral_as: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; cycle_duration_s: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; mean_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; peak_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required; travel_mm: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for current_integral_as: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for cycle_duration_s: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for mean_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for peak_current_a: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required",
+          "reference comparison for travel_mm: only 0 matched, quality-supported asset-days carry this channel in both views; 5 required"
+        ]
+      }
+    },
+    {
+      "case": "real_pipeline_missing_channel",
+      "injected_effect": "HealthPipeline output with the 'missing_channel' stress on TRN001-DOOR-1",
+      "expected_reading": "channel-level completeness keeps the four intact channels usable even though the pipeline's global data_quality_ok is False on every affected day",
+      "asset_id": "TRN001-DOOR-1",
+      "as_of": "2026-06-09T16:00:00+00:00",
+      "record": "real_pipeline_missing_channel.json",
+      "evidence_hash": "2502834b756e123a37dacbda3b72a703c12952552ac28c1d062b9213bffddf07",
+      "summary": {
+        "quality_basis": "channel_completeness",
+        "shifted_channels": [
+          "cycle_duration_s",
+          "mean_current_a"
+        ],
+        "independent_families": [
+          "motor_current",
+          "timing"
+        ],
+        "ambiguous_channels": [],
+        "unknown_channels": [
+          "current_integral_as"
+        ],
+        "peer_comparability": "resolved",
+        "comparable_peers": 9,
+        "shared_with_peers": [],
+        "not_shared_with_peers": [
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "reference_quantifiable": false,
+        "reference_verified_model_identity": false,
+        "reference_parameter_source": null,
+        "reference_demonstration": null,
+        "reference_reason": "no reference views supplied; the adaptation effect is not visible",
+        "recovered_baselines": {},
+        "supported_explanations": [
+          "sensor_or_measurement_change_on_this_door",
+          "mechanical_change_on_this_door",
+          "cannot_distinguish"
+        ],
+        "missing_evidence": [
+          "current_integral_as: insufficient supported recent days",
+          "reference comparison: no reference views supplied; the adaptation effect is not visible"
+        ]
+      }
+    }
+  ]
+}

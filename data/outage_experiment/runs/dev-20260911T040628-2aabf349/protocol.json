@@ -1,0 +1,173 @@
+{
+  "purpose": "Compare the preserved three-consecutive-day smoother with an experimental elapsed-time window that tolerates irregular observations.",
+  "development_seeds": [
+    20260913,
+    20260914
+  ],
+  "evaluation_seeds": [
+    20260915,
+    20260916
+  ],
+  "seeds_differ_from_reported_robustness_run": true,
+  "fleet": {
+    "n_trains": 12,
+    "doors_per_train": 2,
+    "n_days": 120,
+    "cycles_per_day": 35,
+    "n_episodes": 6
+  },
+  "splits": {
+    "fit_days": 30,
+    "calibration": "days 30-84",
+    "replay": "after day 84",
+    "held_train": "first train identity, excluded from all fitting"
+  },
+  "alerting": {
+    "daily_budget": 2,
+    "cooldown_days": 3.0,
+    "threshold_quantile": 0.99,
+    "note": "each method is calibrated to its own threshold on the same pre-replay span; sharing one threshold would rig the comparison"
+  },
+  "scenarios": [
+    "clean",
+    "missing_channel",
+    "missing_days",
+    "blackout",
+    "sensor_offset",
+    "unsupported_context"
+  ],
+  "blackout": {
+    "start_offset_days": 5,
+    "length_days": 10
+  },
+  "candidate_grid": [
+    {
+      "min_observations": 2,
+      "max_age_days": 5.0,
+      "max_gap_days": 2.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 5.0,
+      "max_gap_days": 3.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 5.0,
+      "max_gap_days": 4.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 7.0,
+      "max_gap_days": 2.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 7.0,
+      "max_gap_days": 3.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 7.0,
+      "max_gap_days": 4.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 10.0,
+      "max_gap_days": 2.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 10.0,
+      "max_gap_days": 3.0
+    },
+    {
+      "min_observations": 2,
+      "max_age_days": 10.0,
+      "max_gap_days": 4.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 5.0,
+      "max_gap_days": 2.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 5.0,
+      "max_gap_days": 3.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 5.0,
+      "max_gap_days": 4.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 7.0,
+      "max_gap_days": 2.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 7.0,
+      "max_gap_days": 3.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 7.0,
+      "max_gap_days": 4.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 10.0,
+      "max_gap_days": 2.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 10.0,
+      "max_gap_days": 3.0
+    },
+    {
+      "min_observations": 3,
+      "max_age_days": 10.0,
+      "max_gap_days": 4.0
+    }
+  ],
+  "acceptance_criteria": {
+    "outage_availability_affected_min": 0.5,
+    "clean_availability_regression_max": 0.02,
+    "clean_detection_regression_max": 0,
+    "clean_unmatched_alert_increase_max": 0.5,
+    "recovery_coverage_not_worse_than_baseline": true,
+    "recovery_not_slower_than_baseline": true
+  },
+  "selection_rule": {
+    "stage": "development seeds only",
+    "qualify": "every acceptance criterion must pass",
+    "tie_break": [
+      "outage availability on affected assets (max)",
+      "min_observations (max)",
+      "max_age_days (min)",
+      "max_gap_days (min)"
+    ],
+    "frozen_to": "frozen_policy.json",
+    "note": "The evaluation stage loads the selected policy from that file and will not run without it. Acceptance criteria were fixed before the development sweep ran; the tie-break order was added once the sweep showed several qualifiers, and was applied without reference to any evaluation-seed result."
+  },
+  "detectors": [
+    "raw",
+    "directional",
+    "mahalanobis"
+  ],
+  "code": {
+    "experiment_script": "99aafa82c75519b4aef0fc0611676ff18fae1faa4ae7fe81219cdee8212abb81",
+    "detector_module": "1c495eeba1046f50c3d29026b55e792f6c3b77948d887d9476e41984add5a344",
+    "baseline_module": "30cb851c4da3901c394f726a455064a99c223dfd285781b3c51ec7f7c17a16bc",
+    "metrics_module": "bdd41a7faa899562ffc9d3ef4cf67f9b8aed8f5dc874f25e990c2e178195b075"
+  },
+  "limitations": [
+    "Small fixed synthetic fleets; not external validation and not evidence of rail performance.",
+    "Fault labels are unchanged by sensor and context perturbations, so an unmatched alert is not necessarily a pointless inspection.",
+    "Whole-fleet and affected-asset replays hold separate alert budgets; their counts are not additive.",
+    "Correlated daily rows; episode counts are small and are not independent failures.",
+    "No model is promoted and no operational threshold is changed by this experiment."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "seeds": [
+    20260911,
+    20260912
+  ],
+  "scenarios": [
+    "clean",
+    "missing_channel",
+    "sensor_offset",
+    "unsupported_context",
+    "missing_days"
+  ],
+  "fit_days": 30,
+  "cutoff_day": 84,
+  "threshold_quantile": 0.99,
+  "daily_alert_budget": 2,
+  "cooldown_days": 3,
+  "missing_channel_fraction": 0.3,
+  "offset_as": 0.6,
+  "context_input_shift_c": 20,
+  "outage": "remove every third post-cutoff telemetry day from affected assets",
+  "affected": "first three train identities; first train held out of all fitting",
+  "script_hash": "1a7118f6f77334ca184d9ff10fc5baa0b1768a64554f00b8b97e46cf7e2a9246",
+  "scoring_module_hash": "30cb851c4da3901c394f726a455064a99c223dfd285781b3c51ec7f7c17a16bc",
+  "limitations": [
+    "Fixed small synthetic fleets; not external validation or a model-selection exercise.",
+    "Fault labels unchanged during sensor/context perturbations; unlabelled alerts are not necessarily pointless inspections.",
+    "Population replays have separate alert budgets; their counts are not additive.",
+    "RUL paired comparison is retrospective held-train evaluation, not chronological testing."
+  ]
+}

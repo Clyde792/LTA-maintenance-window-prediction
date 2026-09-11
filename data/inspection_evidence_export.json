@@ -1,0 +1,3342 @@
+{
+  "exportedAt": "2026-09-11T14:43:49.126342+08:00",
+  "source": "door_deferral.parquet",
+  "sourceArtifact": "sha256:ce0c10e3c5068b88",
+  "modelVersion": null,
+  "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it",
+  "staleAfterDays": 7,
+  "explanationOrderNames": [
+    "sensor_or_measurement_change_on_this_door",
+    "mechanical_change_on_this_door",
+    "common_influence_across_doors",
+    "reference_contamination",
+    "cannot_distinguish"
+  ],
+  "policy": {
+    "recent_days": 5,
+    "reference_days": 21,
+    "settling_days": 0,
+    "min_recent_days": 3,
+    "min_reference_days": 10,
+    "shift_sigma": 2.0,
+    "peer_share_sigma": 1.0,
+    "min_peers": 3,
+    "min_context_days": 3,
+    "min_overlap_days": 3,
+    "min_matched_days": 5,
+    "min_channel_completeness": 0.9,
+    "location_offset_sigma": 1.0,
+    "affine_tolerance": 1e-06
+  },
+  "contextTolerance": {
+    "ambient_temp_c_mean": 3.0,
+    "load_proxy_mean": 0.15,
+    "hour_of_day_mean": 2.0
+  },
+  "unavailableDoors": [],
+  "suggestions": {
+    "sensor_or_measurement_change_on_this_door": [
+      "Independent re-measurement of the affected channel on a few cycles",
+      "Records of any door control unit, sensor, wiring or firmware change since the reference window",
+      "Whether the same channel on the opposite leaf or paired door shows the shift"
+    ],
+    "mechanical_change_on_this_door": [
+      "Recorded observations of movement quality on a sample of cycles",
+      "Maintenance and parts history for this door since the reference window",
+      "Whether the affected channels continue to move together over the next few days"
+    ],
+    "common_influence_across_doors": [
+      "Whether the shift starts on the same date across the comparable peers",
+      "Timetable, duty roster or service pattern changes covering the same dates",
+      "Fleet-wide software, calibration or configuration change records"
+    ],
+    "reference_contamination": [
+      "Inspection or maintenance evidence covering the reference window itself",
+      "The frozen fleet baseline parameters for the same asset-days, alongside the adapted ones",
+      "Any commissioning or post-overhaul record explaining a persistent offset"
+    ],
+    "cannot_distinguish": [
+      "The evidence listed as missing for this assessment",
+      "Continued observation until the unknown channels become supported"
+    ]
+  },
+  "note": "Read-only evidence computed from this build's own telemetry. It does not identify a cause, does not change alerts, urgency or service status, and does not authorise maintenance. Suggested evidence is illustrative and pending operator review.",
+  "records": [
+    {
+      "assetId": "TRN006-DOOR-1",
+      "asOf": "2026-07-04T16:00:00+00:00",
+      "evidenceHash": "46593562744eef78adc55dc20800df96b83c873a0dcda54fbe952e587a184d13",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-06-08T16:00:00+00:00",
+        "reference_end": "2026-06-29T16:00:00+00:00",
+        "recent_start": "2026-06-29T16:00:00+00:00",
+        "recent_end": "2026-07-04T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0957,
+          "sigma": 6.01,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0127,
+          "recentMedian": 0.1084,
+          "referenceScale": 0.0159,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2572,
+          "sigma": 6.19,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0314,
+          "recentMedian": 0.2886,
+          "referenceScale": 0.0415,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0301,
+          "sigma": 3.3,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.006,
+          "recentMedian": 0.0361,
+          "referenceScale": 0.0091,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2528,
+          "sigma": 12.31,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0316,
+          "recentMedian": 0.2844,
+          "referenceScale": 0.0205,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "decrease",
+          "change": -1.5866,
+          "sigma": -6.95,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.0771,
+          "recentMedian": -1.6637,
+          "referenceScale": 0.2282,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unchanged": [],
+        "unknown": [],
+        "families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous": [
+          "current_integral_as"
+        ],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": true
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.09,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.17,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.16,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.11,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.05,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "change",
+          "observation": "current_integral_as increase of +0.2528 A.s (+12.31 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS2",
+          "kind": "change",
+          "observation": "cycle_duration_s increase of +0.09571 s (+6.01 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS3",
+          "kind": "change",
+          "observation": "mean_current_a increase of +0.03009 A (+3.30 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS4",
+          "kind": "change",
+          "observation": "peak_current_a increase of +0.2572 A (+6.19 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS5",
+          "kind": "change",
+          "observation": "travel_mm decrease of -1.587 mm (-6.95 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS6",
+          "kind": "multi_family",
+          "observation": "channels from 3 physically distinct families shifted together: motor_current, position, timing"
+        },
+        {
+          "id": "OBS7",
+          "kind": "wear_consistent",
+          "observation": "every shift is in the direction the contract associates with wear for that channel"
+        },
+        {
+          "id": "OBS8",
+          "kind": "ambiguous",
+          "observation": "shifted but not attributable to one measurement family: current_integral_as"
+        },
+        {
+          "id": "OBS9",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in current_integral_as do not show the same direction of change"
+        },
+        {
+          "id": "OBS10",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+        },
+        {
+          "id": "OBS11",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS12",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in peak_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS13",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in travel_mm do not show the same direction of change"
+        },
+        {
+          "id": "OBS14",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: current_integral_as, cycle_duration_s, mean_current_a, peak_current_a, travel_mm.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS6",
+            "OBS7",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ]
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS14"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN006-DOOR-1",
+      "asOf": "2026-07-29T16:00:00+00:00",
+      "evidenceHash": "1882b76d88556ec7f12453b72d55d951ed3bafdc953071d94a533004f1f5efc0",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-07-03T16:00:00+00:00",
+        "reference_end": "2026-07-24T16:00:00+00:00",
+        "recent_start": "2026-07-24T16:00:00+00:00",
+        "recent_end": "2026-07-29T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.096,
+          "sigma": -0.76,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.116,
+          "recentMedian": 0.02,
+          "referenceScale": 0.1268,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.3026,
+          "sigma": -0.78,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.3245,
+          "recentMedian": 0.0219,
+          "referenceScale": 0.3896,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.0295,
+          "sigma": -0.62,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0351,
+          "recentMedian": 0.0055,
+          "referenceScale": 0.0474,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.2699,
+          "sigma": -0.72,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.3031,
+          "recentMedian": 0.0332,
+          "referenceScale": 0.3764,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 1.1211,
+          "sigma": 0.55,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -1.5018,
+          "recentMedian": -0.3806,
+          "referenceScale": 2.0442,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [],
+        "unchanged": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "families": [],
+        "ambiguous": [],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": false
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.04,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.09,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.32,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.02,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.02,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS1"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN013-DOOR-2",
+      "asOf": "2026-06-26T16:00:00+00:00",
+      "evidenceHash": "fff6066d0a9895d833f9c5724ef83dc068b5a949992d710b86ad2c27480a0f0f",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-05-31T16:00:00+00:00",
+        "reference_end": "2026-06-21T16:00:00+00:00",
+        "recent_start": "2026-06-21T16:00:00+00:00",
+        "recent_end": "2026-06-26T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0784,
+          "sigma": 5.41,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0379,
+          "recentMedian": 0.1163,
+          "referenceScale": 0.0145,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2656,
+          "sigma": 3.31,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0921,
+          "recentMedian": 0.3577,
+          "referenceScale": 0.0802,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0267,
+          "sigma": 2.44,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0138,
+          "recentMedian": 0.0406,
+          "referenceScale": 0.011,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.1998,
+          "sigma": 3.65,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1068,
+          "recentMedian": 0.3066,
+          "referenceScale": 0.0547,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "decrease",
+          "change": -1.6835,
+          "sigma": -2.66,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.2586,
+          "recentMedian": -1.9421,
+          "referenceScale": 0.633,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unchanged": [],
+        "unknown": [],
+        "families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous": [
+          "current_integral_as"
+        ],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": true
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.04,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.04,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.07,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.11,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.07,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "change",
+          "observation": "current_integral_as increase of +0.1998 A.s (+3.65 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS2",
+          "kind": "change",
+          "observation": "cycle_duration_s increase of +0.07837 s (+5.41 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS3",
+          "kind": "change",
+          "observation": "mean_current_a increase of +0.02673 A (+2.44 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS4",
+          "kind": "change",
+          "observation": "peak_current_a increase of +0.2656 A (+3.31 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS5",
+          "kind": "change",
+          "observation": "travel_mm decrease of -1.683 mm (-2.66 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS6",
+          "kind": "multi_family",
+          "observation": "channels from 3 physically distinct families shifted together: motor_current, position, timing"
+        },
+        {
+          "id": "OBS7",
+          "kind": "wear_consistent",
+          "observation": "every shift is in the direction the contract associates with wear for that channel"
+        },
+        {
+          "id": "OBS8",
+          "kind": "ambiguous",
+          "observation": "shifted but not attributable to one measurement family: current_integral_as"
+        },
+        {
+          "id": "OBS9",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in current_integral_as do not show the same direction of change"
+        },
+        {
+          "id": "OBS10",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+        },
+        {
+          "id": "OBS11",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS12",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in peak_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS13",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in travel_mm do not show the same direction of change"
+        },
+        {
+          "id": "OBS14",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: current_integral_as, cycle_duration_s, mean_current_a, peak_current_a, travel_mm.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS6",
+            "OBS7",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ]
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS14"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN013-DOOR-2",
+      "asOf": "2026-07-29T16:00:00+00:00",
+      "evidenceHash": "64d0a305c37c506e8464aeab9edd5871b5020a18f1a88814b51306d48130f2bf",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-07-03T16:00:00+00:00",
+        "reference_end": "2026-07-24T16:00:00+00:00",
+        "recent_start": "2026-07-24T16:00:00+00:00",
+        "recent_end": "2026-07-29T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.1237,
+          "sigma": -0.73,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.148,
+          "recentMedian": 0.0243,
+          "referenceScale": 0.1694,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.3209,
+          "sigma": -0.68,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.383,
+          "recentMedian": 0.0621,
+          "referenceScale": 0.4723,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.0349,
+          "sigma": -0.82,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0493,
+          "recentMedian": 0.0145,
+          "referenceScale": 0.0426,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.3143,
+          "sigma": -0.74,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.3777,
+          "recentMedian": 0.0634,
+          "referenceScale": 0.4247,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 1.9007,
+          "sigma": 0.78,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -1.7269,
+          "recentMedian": 0.1738,
+          "referenceScale": 2.4288,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [],
+        "unchanged": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "families": [],
+        "ambiguous": [],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": false
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.04,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.09,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.32,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.02,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.02,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS1"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN021-DOOR-2",
+      "asOf": "2026-07-19T16:00:00+00:00",
+      "evidenceHash": "57988965b93ad5f990b00efab90ceb26332076ab631b990ef18bfbd25c4986a1",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-06-23T16:00:00+00:00",
+        "reference_end": "2026-07-14T16:00:00+00:00",
+        "recent_start": "2026-07-14T16:00:00+00:00",
+        "recent_end": "2026-07-19T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0997,
+          "sigma": 3.46,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.066,
+          "recentMedian": 0.1657,
+          "referenceScale": 0.0288,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.3019,
+          "sigma": 4.26,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1389,
+          "recentMedian": 0.4408,
+          "referenceScale": 0.0709,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0372,
+          "sigma": 2.42,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0294,
+          "recentMedian": 0.0666,
+          "referenceScale": 0.0154,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.266,
+          "sigma": 6.41,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1494,
+          "recentMedian": 0.4154,
+          "referenceScale": 0.0415,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "decrease",
+          "change": -1.5503,
+          "sigma": -3.68,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.301,
+          "recentMedian": -1.8513,
+          "referenceScale": 0.4208,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unchanged": [],
+        "unknown": [],
+        "families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous": [
+          "current_integral_as"
+        ],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": true
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.04,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.03,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.08,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.09,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.01,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "change",
+          "observation": "current_integral_as increase of +0.266 A.s (+6.41 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS2",
+          "kind": "change",
+          "observation": "cycle_duration_s increase of +0.09971 s (+3.46 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS3",
+          "kind": "change",
+          "observation": "mean_current_a increase of +0.03719 A (+2.42 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS4",
+          "kind": "change",
+          "observation": "peak_current_a increase of +0.3019 A (+4.26 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS5",
+          "kind": "change",
+          "observation": "travel_mm decrease of -1.55 mm (-3.68 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS6",
+          "kind": "multi_family",
+          "observation": "channels from 3 physically distinct families shifted together: motor_current, position, timing"
+        },
+        {
+          "id": "OBS7",
+          "kind": "wear_consistent",
+          "observation": "every shift is in the direction the contract associates with wear for that channel"
+        },
+        {
+          "id": "OBS8",
+          "kind": "ambiguous",
+          "observation": "shifted but not attributable to one measurement family: current_integral_as"
+        },
+        {
+          "id": "OBS9",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in current_integral_as do not show the same direction of change"
+        },
+        {
+          "id": "OBS10",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+        },
+        {
+          "id": "OBS11",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS12",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in peak_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS13",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in travel_mm do not show the same direction of change"
+        },
+        {
+          "id": "OBS14",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: current_integral_as, cycle_duration_s, mean_current_a, peak_current_a, travel_mm.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS6",
+            "OBS7",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ]
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS14"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN021-DOOR-2",
+      "asOf": "2026-07-29T16:00:00+00:00",
+      "evidenceHash": "52416b9913c96da9163882859ddf374bfa14f540fc0f7ebee8656a9c4c04e26e",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-07-03T16:00:00+00:00",
+        "reference_end": "2026-07-24T16:00:00+00:00",
+        "recent_start": "2026-07-24T16:00:00+00:00",
+        "recent_end": "2026-07-29T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2458,
+          "sigma": 3.3,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1317,
+          "recentMedian": 0.3775,
+          "referenceScale": 0.0745,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.6687,
+          "sigma": 2.73,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.3515,
+          "recentMedian": 1.0202,
+          "referenceScale": 0.2448,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.067,
+          "sigma": 2.24,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.049,
+          "recentMedian": 0.116,
+          "referenceScale": 0.0299,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.5699,
+          "sigma": 3.67,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.3183,
+          "recentMedian": 0.8882,
+          "referenceScale": 0.1551,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "decrease",
+          "change": -4.2334,
+          "sigma": -4.1,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.9067,
+          "recentMedian": -5.14,
+          "referenceScale": 1.0316,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unchanged": [],
+        "unknown": [],
+        "families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous": [
+          "current_integral_as"
+        ],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": true
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.11,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.1,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.32,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.04,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.03,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "change",
+          "observation": "current_integral_as increase of +0.5699 A.s (+3.67 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS2",
+          "kind": "change",
+          "observation": "cycle_duration_s increase of +0.2458 s (+3.30 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS3",
+          "kind": "change",
+          "observation": "mean_current_a increase of +0.06698 A (+2.24 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS4",
+          "kind": "change",
+          "observation": "peak_current_a increase of +0.6687 A (+2.73 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS5",
+          "kind": "change",
+          "observation": "travel_mm decrease of -4.233 mm (-4.10 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS6",
+          "kind": "multi_family",
+          "observation": "channels from 3 physically distinct families shifted together: motor_current, position, timing"
+        },
+        {
+          "id": "OBS7",
+          "kind": "wear_consistent",
+          "observation": "every shift is in the direction the contract associates with wear for that channel"
+        },
+        {
+          "id": "OBS8",
+          "kind": "ambiguous",
+          "observation": "shifted but not attributable to one measurement family: current_integral_as"
+        },
+        {
+          "id": "OBS9",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in current_integral_as do not show the same direction of change"
+        },
+        {
+          "id": "OBS10",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+        },
+        {
+          "id": "OBS11",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS12",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in peak_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS13",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in travel_mm do not show the same direction of change"
+        },
+        {
+          "id": "OBS14",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: current_integral_as, cycle_duration_s, mean_current_a, peak_current_a, travel_mm.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS6",
+            "OBS7",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ]
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS14"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN025-DOOR-2",
+      "asOf": "2026-07-14T16:00:00+00:00",
+      "evidenceHash": "43fa297d60d5af3c173f0f6f5630045fbd05cb7c4c5c0d3fe9da484b73ca1d08",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-06-18T16:00:00+00:00",
+        "reference_end": "2026-07-09T16:00:00+00:00",
+        "recent_start": "2026-07-09T16:00:00+00:00",
+        "recent_end": "2026-07-14T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.1358,
+          "sigma": 3.36,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.0431,
+          "recentMedian": 0.0927,
+          "referenceScale": 0.0405,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2444,
+          "sigma": 2.07,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0124,
+          "recentMedian": 0.2568,
+          "referenceScale": 0.1183,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0454,
+          "sigma": 3.9,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.0224,
+          "recentMedian": 0.023,
+          "referenceScale": 0.0117,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2373,
+          "sigma": 2.77,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.1184,
+          "recentMedian": 0.1189,
+          "referenceScale": 0.0857,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "decrease",
+          "change": -1.7363,
+          "sigma": -2.88,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.7332,
+          "recentMedian": -2.4695,
+          "referenceScale": 0.6039,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unchanged": [],
+        "unknown": [],
+        "families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous": [
+          "current_integral_as"
+        ],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": true
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.03,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.03,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.05,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.25,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.02,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "change",
+          "observation": "current_integral_as increase of +0.2373 A.s (+2.77 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS2",
+          "kind": "change",
+          "observation": "cycle_duration_s increase of +0.1358 s (+3.36 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS3",
+          "kind": "change",
+          "observation": "mean_current_a increase of +0.04543 A (+3.90 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS4",
+          "kind": "change",
+          "observation": "peak_current_a increase of +0.2444 A (+2.07 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS5",
+          "kind": "change",
+          "observation": "travel_mm decrease of -1.736 mm (-2.88 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS6",
+          "kind": "multi_family",
+          "observation": "channels from 3 physically distinct families shifted together: motor_current, position, timing"
+        },
+        {
+          "id": "OBS7",
+          "kind": "wear_consistent",
+          "observation": "every shift is in the direction the contract associates with wear for that channel"
+        },
+        {
+          "id": "OBS8",
+          "kind": "ambiguous",
+          "observation": "shifted but not attributable to one measurement family: current_integral_as"
+        },
+        {
+          "id": "OBS9",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in current_integral_as do not show the same direction of change"
+        },
+        {
+          "id": "OBS10",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+        },
+        {
+          "id": "OBS11",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS12",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in peak_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS13",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in travel_mm do not show the same direction of change"
+        },
+        {
+          "id": "OBS14",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: current_integral_as, cycle_duration_s, mean_current_a, peak_current_a, travel_mm.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS6",
+            "OBS7",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ]
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS14"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN025-DOOR-2",
+      "asOf": "2026-07-29T16:00:00+00:00",
+      "evidenceHash": "050f475db6ab418602103712139fe138d1dc58fcf0db2fda3742508b5e0f788a",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-07-03T16:00:00+00:00",
+        "reference_end": "2026-07-24T16:00:00+00:00",
+        "recent_start": "2026-07-24T16:00:00+00:00",
+        "recent_end": "2026-07-29T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 0.0252,
+          "sigma": 0.23,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1175,
+          "recentMedian": 0.1427,
+          "referenceScale": 0.1098,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 0.0675,
+          "sigma": 0.26,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.3643,
+          "recentMedian": 0.4318,
+          "referenceScale": 0.2594,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.0025,
+          "sigma": -0.08,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0238,
+          "recentMedian": 0.0213,
+          "referenceScale": 0.0322,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 0.0716,
+          "sigma": 0.34,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1903,
+          "recentMedian": 0.2619,
+          "referenceScale": 0.2132,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 0.1981,
+          "sigma": 0.12,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -2.5761,
+          "recentMedian": -2.378,
+          "referenceScale": 1.7074,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [],
+        "unchanged": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "families": [],
+        "ambiguous": [],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": false
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.11,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.1,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.32,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.04,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.02,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS1"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN034-DOOR-2",
+      "asOf": "2026-06-30T16:00:00+00:00",
+      "evidenceHash": "4604657540eb39048adba4078f9ee02baea18859d8abd1a41e92b471dd8a934d",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-06-04T16:00:00+00:00",
+        "reference_end": "2026-06-25T16:00:00+00:00",
+        "recent_start": "2026-06-25T16:00:00+00:00",
+        "recent_end": "2026-06-30T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.1202,
+          "sigma": 4.17,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.0831,
+          "recentMedian": 0.0371,
+          "referenceScale": 0.0289,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2447,
+          "sigma": 3.29,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.1113,
+          "recentMedian": 0.1334,
+          "referenceScale": 0.0744,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0405,
+          "sigma": 3.38,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.0429,
+          "recentMedian": -0.0024,
+          "referenceScale": 0.012,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2498,
+          "sigma": 3.72,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.2393,
+          "recentMedian": 0.0105,
+          "referenceScale": 0.0672,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -1.6863,
+          "sigma": -1.89,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.4493,
+          "recentMedian": -2.1355,
+          "referenceScale": 0.8919,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a"
+        ],
+        "unchanged": [
+          "travel_mm"
+        ],
+        "unknown": [],
+        "families": [
+          "motor_current",
+          "timing"
+        ],
+        "ambiguous": [
+          "current_integral_as"
+        ],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": true
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.07,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.14,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.1,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.01,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.1,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "change",
+          "observation": "current_integral_as increase of +0.2498 A.s (+3.72 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS2",
+          "kind": "change",
+          "observation": "cycle_duration_s increase of +0.1202 s (+4.17 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS3",
+          "kind": "change",
+          "observation": "mean_current_a increase of +0.04047 A (+3.38 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS4",
+          "kind": "change",
+          "observation": "peak_current_a increase of +0.2447 A (+3.29 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS5",
+          "kind": "multi_family",
+          "observation": "channels from 2 physically distinct families shifted together: motor_current, timing"
+        },
+        {
+          "id": "OBS6",
+          "kind": "wear_consistent",
+          "observation": "every shift is in the direction the contract associates with wear for that channel"
+        },
+        {
+          "id": "OBS7",
+          "kind": "ambiguous",
+          "observation": "shifted but not attributable to one measurement family: current_integral_as"
+        },
+        {
+          "id": "OBS8",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in current_integral_as do not show the same direction of change"
+        },
+        {
+          "id": "OBS9",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+        },
+        {
+          "id": "OBS10",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS11",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in peak_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS12",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS8",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: current_integral_as, cycle_duration_s, mean_current_a, peak_current_a.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS5",
+            "OBS6",
+            "OBS8",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": [
+            "OBS10",
+            "OBS11",
+            "OBS8",
+            "OBS9"
+          ]
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS12"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN034-DOOR-2",
+      "asOf": "2026-07-29T16:00:00+00:00",
+      "evidenceHash": "58665a60fce93baea38529dbdf19e699a215c01c1dd58a4898c4f4b860045964",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-07-03T16:00:00+00:00",
+        "reference_end": "2026-07-24T16:00:00+00:00",
+        "recent_start": "2026-07-24T16:00:00+00:00",
+        "recent_end": "2026-07-29T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.1605,
+          "sigma": -0.76,
+          "referenceDays": 20,
+          "recentDays": 5,
+          "referenceMedian": 0.0481,
+          "recentMedian": -0.1124,
+          "referenceScale": 0.2123,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.457,
+          "sigma": -0.87,
+          "referenceDays": 20,
+          "recentDays": 5,
+          "referenceMedian": 0.2667,
+          "recentMedian": -0.1903,
+          "referenceScale": 0.5273,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.0383,
+          "sigma": -0.8,
+          "referenceDays": 20,
+          "recentDays": 5,
+          "referenceMedian": -0.0131,
+          "recentMedian": -0.0514,
+          "referenceScale": 0.0476,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.3926,
+          "sigma": -0.85,
+          "referenceDays": 20,
+          "recentDays": 5,
+          "referenceMedian": 0.0845,
+          "recentMedian": -0.308,
+          "referenceScale": 0.4624,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 2.273,
+          "sigma": 0.79,
+          "referenceDays": 20,
+          "recentDays": 5,
+          "referenceMedian": -2.3682,
+          "recentMedian": -0.0952,
+          "referenceScale": 2.8789,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [],
+        "unchanged": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "families": [],
+        "ambiguous": [],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": false
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.04,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.09,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.32,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.02,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.02,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS1"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN038-DOOR-2",
+      "asOf": "2026-06-20T16:00:00+00:00",
+      "evidenceHash": "93f7b499bf9fd7b0a084e3f43a02a7a1c9f6f5089cb560eaac05a33b4e13c98b",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-05-25T16:00:00+00:00",
+        "reference_end": "2026-06-15T16:00:00+00:00",
+        "recent_start": "2026-06-15T16:00:00+00:00",
+        "recent_end": "2026-06-20T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0949,
+          "sigma": 4.93,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0806,
+          "recentMedian": 0.1755,
+          "referenceScale": 0.0192,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.3273,
+          "sigma": 3.48,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1328,
+          "recentMedian": 0.4601,
+          "referenceScale": 0.0941,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.0312,
+          "sigma": 2.05,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0323,
+          "recentMedian": 0.0635,
+          "referenceScale": 0.0152,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "increase",
+          "change": 0.2465,
+          "sigma": 6.05,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1958,
+          "recentMedian": 0.4423,
+          "referenceScale": 0.0407,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "decrease",
+          "change": -1.5274,
+          "sigma": -2.85,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.2587,
+          "recentMedian": -1.7862,
+          "referenceScale": 0.5355,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unchanged": [],
+        "unknown": [],
+        "families": [
+          "motor_current",
+          "position",
+          "timing"
+        ],
+        "ambiguous": [
+          "current_integral_as"
+        ],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": true
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.27,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.11,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.01,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.08,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.19,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "change",
+          "observation": "current_integral_as increase of +0.2465 A.s (+6.05 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS2",
+          "kind": "change",
+          "observation": "cycle_duration_s increase of +0.09489 s (+4.93 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS3",
+          "kind": "change",
+          "observation": "mean_current_a increase of +0.03116 A (+2.05 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS4",
+          "kind": "change",
+          "observation": "peak_current_a increase of +0.3273 A (+3.48 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS5",
+          "kind": "change",
+          "observation": "travel_mm decrease of -1.527 mm (-2.85 reference sigma) against its own 21-day reference"
+        },
+        {
+          "id": "OBS6",
+          "kind": "multi_family",
+          "observation": "channels from 3 physically distinct families shifted together: motor_current, position, timing"
+        },
+        {
+          "id": "OBS7",
+          "kind": "wear_consistent",
+          "observation": "every shift is in the direction the contract associates with wear for that channel"
+        },
+        {
+          "id": "OBS8",
+          "kind": "ambiguous",
+          "observation": "shifted but not attributable to one measurement family: current_integral_as"
+        },
+        {
+          "id": "OBS9",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in current_integral_as do not show the same direction of change"
+        },
+        {
+          "id": "OBS10",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in cycle_duration_s do not show the same direction of change"
+        },
+        {
+          "id": "OBS11",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in mean_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS12",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in peak_current_a do not show the same direction of change"
+        },
+        {
+          "id": "OBS13",
+          "kind": "peer_not_shared",
+          "observation": "79 comparable peers with supported evidence in travel_mm do not show the same direction of change"
+        },
+        {
+          "id": "OBS14",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family. Independent channels also moved. That does not corroborate a single-transducer fault, and it does not exclude a sensor problem occurring alongside another change.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements. Comparable peers did not show the change in: current_integral_as, cycle_duration_s, mean_current_a, peak_current_a, travel_mm.",
+          "supported_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS6",
+            "OBS7",
+            "OBS9"
+          ],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": [
+            "OBS10",
+            "OBS11",
+            "OBS12",
+            "OBS13",
+            "OBS9"
+          ]
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS14"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    },
+    {
+      "assetId": "TRN038-DOOR-2",
+      "asOf": "2026-07-29T16:00:00+00:00",
+      "evidenceHash": "b588481f1f452e0e0b75010ae51834bedf804c89c54653d5dc3755c9b87d7043",
+      "qualityBasis": "channel_completeness",
+      "qualityBlocking": [],
+      "window": {
+        "reference_start": "2026-07-03T16:00:00+00:00",
+        "reference_end": "2026-07-24T16:00:00+00:00",
+        "recent_start": "2026-07-24T16:00:00+00:00",
+        "recent_end": "2026-07-29T16:00:00+00:00"
+      },
+      "changes": {
+        "cycle_duration_s": {
+          "unit": "s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 0.0019,
+          "sigma": 0.12,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.071,
+          "recentMedian": 0.0729,
+          "referenceScale": 0.0155,
+          "qualityBasis": "channel_completeness"
+        },
+        "peak_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.0396,
+          "sigma": -1.02,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1183,
+          "recentMedian": 0.0787,
+          "referenceScale": 0.039,
+          "qualityBasis": "channel_completeness"
+        },
+        "mean_current_a": {
+          "unit": "A",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.0111,
+          "sigma": -1.15,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.0292,
+          "recentMedian": 0.0181,
+          "referenceScale": 0.0096,
+          "qualityBasis": "channel_completeness"
+        },
+        "current_integral_as": {
+          "unit": "A.s",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": -0.0202,
+          "sigma": -1.07,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": 0.1884,
+          "recentMedian": 0.1682,
+          "referenceScale": 0.0188,
+          "qualityBasis": "channel_completeness"
+        },
+        "travel_mm": {
+          "unit": "mm",
+          "status": "observed",
+          "reason": null,
+          "direction": "no_detected_change",
+          "change": 0.2738,
+          "sigma": 0.76,
+          "referenceDays": 21,
+          "recentDays": 5,
+          "referenceMedian": -0.3426,
+          "recentMedian": -0.0688,
+          "referenceScale": 0.3622,
+          "qualityBasis": "channel_completeness"
+        }
+      },
+      "cross": {
+        "shifted": [],
+        "unchanged": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "families": [],
+        "ambiguous": [],
+        "singleShifted": false,
+        "isolated": false,
+        "wearConsistent": false
+      },
+      "peers": {
+        "status": "resolved",
+        "reason": null,
+        "comparable": 79,
+        "considered": 79,
+        "shared": [],
+        "notShared": [
+          "current_integral_as",
+          "cycle_duration_s",
+          "mean_current_a",
+          "peak_current_a",
+          "travel_mm"
+        ],
+        "unknown": [],
+        "channels": {
+          "current_integral_as": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.04,
+            "shared": false
+          },
+          "cycle_duration_s": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.1,
+            "shared": false
+          },
+          "mean_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.32,
+            "shared": false
+          },
+          "peak_current_a": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": -0.02,
+            "shared": false
+          },
+          "travel_mm": {
+            "status": "observed",
+            "reason": null,
+            "peers": 79,
+            "median": 0.02,
+            "shared": false
+          }
+        }
+      },
+      "reference": {
+        "quantifiable": false,
+        "reason": "no reference views supplied; the adaptation effect is not visible",
+        "verifiedModelIdentity": false,
+        "parameterSource": null,
+        "demonstration": null,
+        "channels": {}
+      },
+      "observations": [
+        {
+          "id": "OBS1",
+          "kind": "missing",
+          "observation": "not established: reference comparison: no reference views supplied; the adaptation effect is not visible"
+        }
+      ],
+      "explanations": [
+        {
+          "explanation": "sensor_or_measurement_change_on_this_door",
+          "statement": "A measurement or sensor change on this door would explain a shift confined to one measurement family.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "mechanical_change_on_this_door",
+          "statement": "A mechanical change on this door would explain a coherent shift across physically independent measurements.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "common_influence_across_doors",
+          "statement": "Something common to these doors would explain a change they share - duty, environment, timetable, or a fleet-wide calibration or configuration change. This does not identify which, and does not establish a sensor fault.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "reference_contamination",
+          "statement": "Reference adaptation may have absorbed a baseline level difference that the frozen fleet baseline still carries. The adaptation effect cannot be quantified: no reference views supplied; the adaptation effect is not visible.",
+          "supported_by": [],
+          "contradicted_by": []
+        },
+        {
+          "explanation": "cannot_distinguish",
+          "statement": "The available observations do not separate the explanations above.",
+          "supported_by": [
+            "OBS1"
+          ],
+          "contradicted_by": []
+        }
+      ],
+      "missingEvidence": [
+        "reference comparison: no reference views supplied; the adaptation effect is not visible"
+      ],
+      "explanationOrder": "fixed and unranked; the number of supporting observations is not a score, a probability or a diagnostic priority, and several statements may restate one underlying fact",
+      "suggestionsStatus": "illustrative, pending operator review",
+      "safeguards": {
+        "identifies_root_cause": false,
+        "suppresses_alerts": false,
+        "reduces_urgency": false,
+        "authorises_deferral": false,
+        "release_to_service": false,
+        "changes_detector_or_thresholds": false,
+        "prescribes_maintenance_procedure": false
+      },
+      "limitation": "Experimental evidence summary. It does not identify a cause, estimate a probability, or establish that any explanation is correct. It does not change alerts, aspects, urgency, deferral or service status.",
+      "source": "door_deferral.parquet",
+      "sourceArtifact": "sha256:ce0c10e3c5068b88",
+      "modelVersion": null,
+      "modelVersionReason": "no artifact in this build records a trained-model identity; sourceArtifact identifies the telemetry the evidence was computed from, not the model that produced it"
+    }
+  ]
+}
