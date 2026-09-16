@@ -246,24 +246,82 @@ class Passthrough(Detector):
 # Runner
 # --------------------------------------------------------------------------
 
+def reference_frame(daily: pd.DataFrame, reference_start, reference_end,
+                    eligible_assets=None) -> pd.DataFrame:
+    """Rows usable as reference under an explicit, declared boundary.
+
+    Decided on the replay clock: a day counts once its aggregate has LANDED, so
+    a row qualifies when `reference_start < available_at <= reference_end`. The
+    boundary is the same for every detector and for preprocessing, and nothing
+    about it is inferred from the data's own start date.
+    """
+    start, end = pd.Timestamp(reference_start), pd.Timestamp(reference_end)
+    if not start < end:
+        raise ValueError("reference_start must precede reference_end")
+    available = (pd.to_datetime(daily["available_at"]) if "available_at" in daily
+                 else pd.to_datetime(daily["day"]) + pd.Timedelta(days=1))
+    mask = (available > start) & (available <= end)
+    if eligible_assets is not None:
+        mask &= daily["asset_id"].isin(list(eligible_assets))
+    return daily[mask]
+
+
 def run(
     detectors: dict[str, Detector],
     daily: pd.DataFrame,
     reference_days: int = 30,
     smooth_days: int = 5,
+    *,
+    reference_start=None,
+    reference_end=None,
+    eligible_assets=None,
+    score_valid_column: str | None = None,
+    reference_valid_column: str | None = None,
 ) -> pd.DataFrame:
     """Fit every detector on the reference window and score the full history.
 
     Returns `daily` with one score column per detector, all smoothed the same
     way so the comparison is about the detector rather than the smoothing.
+
+    Two ways to say what the reference is, and they may not be mixed:
+      * `reference_days` (historical default): the first N days of `daily`.
+      * `reference_start` + `reference_end` [+ `eligible_assets`]: an explicit
+        declared window on the availability clock. Use this for any evaluation
+        whose splits were reviewed; `reference_days` is then ignored.
+
+    Validity, for the explicit path only:
+      * `score_valid_column` names a boolean column. Rows not True are never
+        scored, so they cannot enter a stateful detector (the EWMA recursion) or
+        the smoothing window. The historical path scores every complete row and
+        masks invalid ones only AFTER smoothing, so an invalid reading there can
+        still move a later valid score; it is kept unchanged for the legacy
+        experiments that depend on it, and should not be used for new ones.
+      * `reference_valid_column` names a boolean column of explicit
+        reference-quality checks. It must not be a prediction-readiness flag:
+        those reject every date before the fit, which is the whole reference.
     """
     out = daily.sort_values(["asset_id", "day"]).copy()
-    start = out.day.min()
-    reference = out[out.day < start + pd.Timedelta(days=reference_days)]
+    explicit = reference_start is not None or reference_end is not None
+    if (score_valid_column or reference_valid_column) and not explicit:
+        raise ValueError("validity columns require an explicit reference window")
+    if explicit:
+        if reference_start is None or reference_end is None:
+            raise ValueError("an explicit reference needs both reference_start and reference_end")
+        reference = reference_frame(out, reference_start, reference_end, eligible_assets)
+    else:
+        if eligible_assets is not None:
+            raise ValueError("eligible_assets requires an explicit reference window")
+        start = out.day.min()
+        reference = out[out.day < start + pd.Timedelta(days=reference_days)]
+
+    valid = (out[score_valid_column].eq(True).to_numpy() if score_valid_column
+             else np.ones(len(out), bool))
+    if reference_valid_column:
+        reference = reference[reference[reference_valid_column].eq(True)]
 
     for key, det in detectors.items():
         needs = det.needs if hasattr(det, "needs") else [det.column]
-        complete = np.isfinite(out[needs].to_numpy(float)).all(axis=1)
+        complete = np.isfinite(out[needs].to_numpy(float)).all(axis=1) & valid
         ref_complete = np.isfinite(reference[needs].to_numpy(float)).all(axis=1)
         if ref_complete.sum() < 5:
             out[key] = np.nan

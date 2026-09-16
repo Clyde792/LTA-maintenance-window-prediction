@@ -1,0 +1,49 @@
+{
+  "run_kind": "synthetic",
+  "subsystem": "door",
+  "telemetry": "../data/door_cycles.parquet",
+  "development_episodes": "../data/door_episodes_development.csv",
+  "test_episodes": "../data/door_episodes_test.csv",
+  "output_dir": "../data/ps3_runs",
+  "timezone": "Asia/Singapore",
+  "boundaries": {
+    "reference_start": "2026-04-01",
+    "reference_end": "2026-05-01",
+    "calibration_end": "2026-05-31",
+    "validation_end": "2026-06-24",
+    "test_end": "2026-07-30"
+  },
+  "expected_grid": "from_first_observation",
+  "reference_eligibility": {
+    "assets": "all",
+    "declared_by": "synthetic generator (headway/synth/doors.py)",
+    "basis": "Synthetic ground truth: no generated degradation episode overlaps 2026-04-01 to 2026-05-01. This is a property of the simulator, not an inspection record, and is not a model for how eligibility is established on real equipment."
+  },
+  "attestations": {
+    "units_verified": false,
+    "identities_verified": false,
+    "fault_labels_verified": false,
+    "reference_eligibility_verified": false,
+    "declared_by": "not applicable: synthetic data, no human review took place"
+  },
+  "label_semantics": {
+    "onset_ts": "simulated start of wear in the generator",
+    "fault_ts": "simulated confirmed fault in the generator"
+  },
+  "data_exposure": {
+    "test_period_previously_inspected": true,
+    "declared_by": "project team: this simulator family and these seeds have been inspected repeatedly"
+  },
+  "policy": {
+    "threshold_quantile": 0.99,
+    "daily_budget": 2,
+    "cooldown_days": 3.0,
+    "minimum_fault_groups": 3,
+    "minimum_recall": 0.8,
+    "maximum_false_alerts_per_asset_month": 1.0,
+    "minimum_score_fraction": 0.9
+  },
+  "smooth_days": 3,
+  "min_reference_days_per_asset": 14,
+  "notes": "Same calendar splits as the legacy synthetic experiment, run through the reviewed-data path with an explicit reference boundary. Its numbers are expected to differ from the legacy result, because the legacy mode's first-30-day and per-asset 21-day fitting assumptions are exactly what this path removes. Labels are split by scripts/split_episode_labels.py at validation_end; the synthetic label file had already been read in full before the split, so the split enforces the code boundary but does not make the synthetic test period untouched."
+}

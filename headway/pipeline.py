@@ -21,6 +21,10 @@ class HealthPipeline:
     peak_bands: list = field(default_factory=list,init=False)
     load_peak: float = field(default=float("nan"),init=False)
     load_offpeak: float = field(default=float("nan"),init=False)
+    # How much of the reference each baseline uses. 21 keeps the dashboard's
+    # historical behaviour (first 21 days per asset). None means the caller has
+    # bounded the reference explicitly and every reference row is used.
+    baseline_reference_days: int | None = 21
 
     @property
     def levels(self):
@@ -47,20 +51,30 @@ class HealthPipeline:
             c[f"{s}_hx"]=b.transform(c).health_index
         return self.multivariate.transform(c).health_index
 
-    def fit(self, reference):
+    def fit(self, reference, *, fitted_at=None):
+        """Fit on `reference` cycles only.
+
+        `fitted_at` declares when preprocessing becomes usable. It must not be
+        earlier than the last reference day's aggregate landing, or a reference
+        row could be scored as though the model had not yet seen it.
+        """
         if reference.empty:
             raise ValueError("historical reference data required")
-        self.fitted_at=reference.ts.max().floor("D")+pd.Timedelta(days=1)
+        earliest=reference.ts.max().floor("D")+pd.Timedelta(days=1)
+        if fitted_at is not None and pd.Timestamp(fitted_at)<earliest:
+            raise ValueError(f"fitted_at {fitted_at} precedes the last reference aggregate ({earliest})")
+        self.fitted_at=earliest if fitted_at is None else pd.Timestamp(fitted_at)
         self.normalisers={s:ConditionNormaliser(s,NORMALISATION_CONTEXT).fit(reference) for s in self.levels}
         self.peak_bands,self.load_peak,self.load_offpeak=duty_mod.peak_bands(reference)
         d=self._daily(reference)
         self.baselines={}
         for s in self.levels:
-            b=AssetBaseline(value=f"res_{s}").fit(d)
+            b=AssetBaseline(value=f"res_{s}",reference_days=self.baseline_reference_days).fit(d)
             self.baselines[s]=b
             d[f"{s}_hx"]=b.transform(d).health_index
         self.multivariate=MultivariateHealthIndex(
             signals=[f"{s}_hx" for s in self.levels],
+            reference_days=self.baseline_reference_days,
             orientation={f"{s}_hx":contract.get(self.subsystem).sign(s) for s in self.levels}).fit(d)
         return self
 

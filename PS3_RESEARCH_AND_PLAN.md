@@ -148,9 +148,24 @@ synthetic dataset only.
 
 ```powershell
 .\.venv\Scripts\python.exe -B scripts/ps3_readiness.py data/door_cycles.parquet --episodes data/door_episodes.csv
-.\.venv\Scripts\python.exe -B scripts/select_ps3_detector.py
+.\.venv\Scripts\python.exe -B scripts/select_ps3_detector.py --legacy-synthetic --out data/ps3_selection_repro
 .\.venv\Scripts\python.exe -B -m pytest tests/test_detector_selection.py tests/test_data_readiness.py -q -p no:cacheprovider
 ```
+
+The selection command now requires `--legacy-synthetic --out <empty directory>`
+to reproduce this experiment, and refuses to overwrite the published artifacts in
+`data/ps3_selection`. Its `selection.json` and `test.json` were verified
+byte-identical to the published ones on 13 September 2026, and again after the
+reviewed-path corrections. Reviewed external data uses `--config` instead; see
+DATA_HANDOVER_PLAN.md §6, Step 5.
+
+How to read this legacy result: it loaded one combined label file and handed all
+of it to `select_detector`; its score fraction and false-alert rate count
+observed rows only; invalid rows were masked after smoothing. It is development
+evidence and was never an untouched evaluation. Its no-winner outcome came from
+zero complete validation episodes, not from those denominators. The reviewed
+path now splits development and test labels into separate inputs, gates on
+expected asset-days, and removes invalid rows before scoring.
 
 The first command deliberately does not attest that units or labels have been
 reviewed. Add the corresponding CLI flags only after completing those reviews.

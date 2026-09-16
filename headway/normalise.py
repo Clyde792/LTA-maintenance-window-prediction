@@ -98,7 +98,10 @@ class ConditionNormaliser:
 class AssetBaseline:
     value: str = "residual"
     by: str = "asset_id"
-    reference_days: int = 21
+    # Days from EACH ASSET'S first row that form its reference. None means the
+    # caller has already bounded the frame to a declared reference window, and
+    # every row given is reference - no hidden per-asset truncation on top.
+    reference_days: int | None = 21
     min_periods: int = 5
     loc_: pd.Series | None = field(default=None, init=False)
     scale_: pd.Series | None = field(default=None, init=False)
@@ -106,8 +109,11 @@ class AssetBaseline:
     fleet_scale_: float = field(default=1., init=False)
 
     def fit(self, df, ts="day"):
-        first = df.groupby(self.by)[ts].transform("min")
-        ref = df[df[ts] < first+pd.Timedelta(days=self.reference_days)].copy()
+        if self.reference_days is None:
+            ref = df.copy()
+        else:
+            first = df.groupby(self.by)[ts].transform("min")
+            ref = df[df[ts] < first+pd.Timedelta(days=self.reference_days)].copy()
         ref[self.value] = pd.to_numeric(ref[self.value],errors="coerce").replace([np.inf,-np.inf],np.nan)
         if ref[self.value].notna().sum() < self.min_periods:
             raise ValueError("insufficient reference observations for baseline")
@@ -138,7 +144,8 @@ class AssetBaseline:
 class MultivariateHealthIndex:
     signals: list[str]
     orientation: dict = field(default_factory=dict)
-    reference_days: int = 21
+    # Days from the frame's first row. None: the whole frame is the reference.
+    reference_days: int | None = 21
     ridge: float = 1e-6
     mode: str = "projection"
     mean_: np.ndarray | None = field(default=None, init=False)
@@ -152,7 +159,8 @@ class MultivariateHealthIndex:
         return np.where(np.isfinite(X),X,np.nan)
 
     def fit(self, daily, ts="day"):
-        ref = daily[daily[ts] < daily[ts].min()+pd.Timedelta(days=self.reference_days)]
+        ref = daily if self.reference_days is None else \
+            daily[daily[ts] < daily[ts].min()+pd.Timedelta(days=self.reference_days)]
         X = self._matrix(ref)
         X = X[np.isfinite(X).all(axis=1)]
         if len(X) <= max(5,len(self.signals)*5):

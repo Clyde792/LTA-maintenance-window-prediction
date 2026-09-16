@@ -89,6 +89,13 @@ ALIASES: dict[str, list[str]] = {
 }
 
 
+# A trailing UTC offset: "Z", "+08:00", "-0500". Used to tell an offset-aware
+# value from a naive one BEFORE parsing, because pandas will not tell us: given a
+# mixed column it returns a tz-aware series with every naive value coerced to
+# NaT, which silently deletes exactly the rows whose meaning is in question.
+OFFSET_SUFFIX = r"(?:Z|z|[+-]\d{2}:?\d{2})\s*$"
+
+
 def _squash(name: str) -> str:
     return re.sub(r"[^a-z0-9]", "", str(name).lower())
 
@@ -231,10 +238,27 @@ class Adapter:
     column_map: dict[str, str] = field(default_factory=dict)
     rename_only: bool = False
     unit_scales: dict[str, float] = field(default_factory=dict)
+    # The timezone the SOURCE timestamps are in, when they are naive. Output is
+    # always naive Asia/Singapore, because that is what the pipeline assumes.
+    # Leave None to pass naive timestamps through untouched and say so.
+    source_timezone: str | None = None
+    # An explicit strptime format. Without one, "03/04/2026" is ambiguous and
+    # pandas guesses; a vendor export is exactly where that bites.
+    timestamp_format: str | None = None
+    # Extra accepted tokens for fault_confirmed, e.g. {"Y": True, "N": False}.
+    # Matched after strip+lower. Anything still unrecognised RAISES.
+    boolean_tokens: dict[str, bool] = field(default_factory=dict)
 
     # Constants used when a context column is absent entirely. Chosen so the
     # term is inert: zero variance means the normaliser's coefficient is
     # meaningless but harmless, and standardisation guards the divide.
+    TARGET_TIMEZONE = "Asia/Singapore"
+
+    # Recognised without declaration. A token outside this set and outside
+    # `boolean_tokens` is an error, never a quiet False.
+    BASE_BOOLEAN_TOKENS = {"true": True, "false": False, "1": True, "0": False,
+                           "1.0": True, "0.0": False, "yes": True, "no": False}
+
     FILL_DEFAULTS = {
         "ambient_temp_c": 28.0,   # a plausible SGT ambient
         "load_proxy": 0.5,        # mid-scale
@@ -255,8 +279,8 @@ class Adapter:
         rep.unmatched_source = [c for c in raw.columns if c not in set(self.column_map.values())]
 
         # 2. types, before derivation - hour_of_day needs a real datetime
-        if "ts" in out.columns and not pd.api.types.is_datetime64_any_dtype(out["ts"]):
-            out["ts"] = pd.to_datetime(out["ts"], errors="coerce")
+        if "ts" in out.columns:
+            out["ts"] = self._parse_ts(out["ts"])
         for col in sub.signals + contract.CONTEXT:
             if col in out.columns:
                 out[col] = pd.to_numeric(out[col], errors="coerce")
@@ -299,6 +323,102 @@ class Adapter:
 
         return self._finalise(out, sub, rep)
 
+    def _parse_ts(self, raw: pd.Series) -> pd.Series:
+        """Parse to NAIVE Asia/Singapore, respecting what each value actually says.
+
+        Four cases:
+          * already tz-aware     -> convert, then drop the zone
+          * all naive + declared -> localise to the declared zone, convert, drop
+          * all naive, undeclared-> pass through; the bind report says so
+          * MIXED aware and naive-> each value keeps its own meaning: an offset
+            value keeps its instant, a naive value is localised to the declared
+            source zone. Parsing the whole column as UTC because *some* rows
+            carry an offset would silently shift every naive row.
+
+        Mixed input with no declared source zone is refused: there is no way to
+        establish what the naive values mean, and guessing would move real
+        cycles across midnight.
+
+        A DST-ambiguous or non-existent local time becomes NaT rather than a
+        guess; `assess_readiness` blocks on invalid timestamps.
+        """
+        if pd.api.types.is_datetime64_any_dtype(raw):
+            if getattr(raw.dtype, "tz", None) is not None:
+                return raw.dt.tz_convert(self.TARGET_TIMEZONE).dt.tz_localize(None)
+            return self._localise(raw)
+
+        kw = {"format": self.timestamp_format} if self.timestamp_format else {}
+        if self._is_mixed(raw):
+            return self._parse_mixed_ts(raw, kw)
+        try:
+            ts = pd.to_datetime(raw, errors="coerce", **kw)
+        except (ValueError, TypeError):
+            return self._parse_mixed_ts(raw, kw)
+        if ts.dtype == object:
+            return self._parse_mixed_ts(raw, kw)
+        if getattr(ts.dtype, "tz", None) is not None:
+            return ts.dt.tz_convert(self.TARGET_TIMEZONE).dt.tz_localize(None)
+        return self._localise(ts)
+
+    @staticmethod
+    def _is_mixed(raw: pd.Series) -> bool:
+        """Does this column hold BOTH offset-bearing and offset-free values?
+
+        Decided on the source text. Asking pandas would be circular: its answer
+        for a mixed column is a tz-aware series with the naive rows turned into
+        NaT, which is the very loss this check exists to prevent.
+        """
+        text = raw.astype("string")
+        present = text.notna() & text.str.strip().ne("").fillna(False)
+        if not present.any():
+            return False
+        offset = text.str.contains(OFFSET_SUFFIX, regex=True, na=False)
+        return bool((offset & present).any() and (~offset & present).any())
+
+    def _localise(self, ts: pd.Series) -> pd.Series:
+        """Naive values -> naive target time, via the declared source zone."""
+        if not self.source_timezone:
+            return ts
+        localised = ts.dt.tz_localize(self.source_timezone, ambiguous="NaT", nonexistent="NaT")
+        return localised.dt.tz_convert(self.TARGET_TIMEZONE).dt.tz_localize(None)
+
+    def _parse_mixed_ts(self, raw: pd.Series, kw: dict) -> pd.Series:
+        """One column holding both offset-aware and naive values.
+
+        Parsed value by value, because that is the only way each keeps its own
+        meaning. Slower than a vectorised parse, and only reached by a column
+        that is genuinely mixed.
+        """
+        parsed = [pd.to_datetime(v, errors="coerce", **kw) for v in raw]
+        aware = [t is not pd.NaT and pd.notna(t) and getattr(t, "tzinfo", None) is not None
+                 for t in parsed]
+        has_naive = any(pd.notna(t) and not a for t, a in zip(parsed, aware))
+        if has_naive and not self.source_timezone:
+            raise ValueError(
+                "this timestamp column mixes offset-aware and naive values, and no "
+                "source_timezone is declared, so the naive values cannot be interpreted. "
+                "Declare source_timezone in the mapping, or normalise the source column.")
+        out = []
+        for value, is_aware in zip(parsed, aware):
+            if pd.isna(value):
+                out.append(pd.NaT)
+            elif is_aware:
+                out.append(pd.Timestamp(value).tz_convert("UTC"))
+            else:
+                local = pd.Timestamp(value).tz_localize(
+                    self.source_timezone, ambiguous="NaT", nonexistent="NaT")
+                out.append(pd.NaT if local is pd.NaT or pd.isna(local) else local.tz_convert("UTC"))
+        series = pd.Series(pd.to_datetime(out, utc=True), index=raw.index)
+        return series.dt.tz_convert(self.TARGET_TIMEZONE).dt.tz_localize(None)
+
+    def _booleans(self) -> dict[str, bool]:
+        tokens = dict(self.BASE_BOOLEAN_TOKENS)
+        for token, value in self.boolean_tokens.items():
+            if not isinstance(value, bool):
+                raise ValueError(f"boolean token {token!r} must map to true or false")
+            tokens[str(token).strip().lower()] = value
+        return tokens
+
     def _finalise(self, out: pd.DataFrame, sub: contract.Subsystem,
                   rep: BindReport) -> tuple[pd.DataFrame, BindReport]:
         if "subsystem" not in out.columns:
@@ -307,10 +427,16 @@ class Adapter:
             if lbl not in out.columns:
                 out[lbl] = default
         if "fault_confirmed" in out.columns:
+            # An absent label means "not confirmed" - the column is sparse by
+            # design. A PRESENT but unrecognised token is an error: quietly
+            # reading it as False would delete a fault from the evaluation.
             tokens = out["fault_confirmed"].fillna(False).astype(str).str.strip().str.lower()
-            mapping = {"true":True,"false":False,"1":True,"0":False,"1.0":True,"0.0":False,"yes":True,"no":False}
-            if not tokens.isin(mapping).all():
-                raise ValueError("unrecognised fault_confirmed boolean value")
+            mapping = self._booleans()
+            unknown = sorted(set(tokens[~tokens.isin(mapping)]))
+            if unknown:
+                raise ValueError(
+                    "unrecognised fault_confirmed value(s): " + ", ".join(repr(u) for u in unknown[:8])
+                    + ". Declare them in the mapping's boolean_tokens, or correct the source.")
             out["fault_confirmed"] = tokens.map(mapping).astype(bool)
 
         keep = [c for c in sub.columns if c in out.columns]
